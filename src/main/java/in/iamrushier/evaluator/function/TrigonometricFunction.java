@@ -2,10 +2,22 @@ package in.iamrushier.evaluator.function;
 
 import java.math.BigDecimal;
 
+/**
+ * {@code TrigonometricFunction} provides static methods for handling various trigonometric operations.
+ * It includes functions for sine, cosine, tangent, and their inverse counterparts.
+ */
 public class TrigonometricFunction {
+    /**
+     * Private constructor to prevent instantiation of this utility class.
+     */
     private TrigonometricFunction() {
     }
 
+    /**
+     * Normalizes an angle to be within the range [0, 360) degrees.
+     * @param angle The angle to normalize.
+     * @return The normalized angle.
+     */
     private static BigDecimal normalizeAngle(BigDecimal angle) {
         BigDecimal normalized = angle;
         while (normalized.doubleValue() >= 360) {
@@ -17,6 +29,11 @@ public class TrigonometricFunction {
         return normalized;
     }
 
+    /**
+     * Calculates the sine of an angle.
+     * @param angle The angle in degrees.
+     * @return The sine of the angle as a String.
+     */
     public static String handleSin(BigDecimal angle) {
         angle = normalizeAngle(angle);
         if (angle.doubleValue() == 0) {
@@ -40,6 +57,11 @@ public class TrigonometricFunction {
         }
     }
 
+    /**
+     * Calculates the cosine of an angle.
+     * @param angle The angle in degrees.
+     * @return The cosine of the angle as a String.
+     */
     public static String handleCos(BigDecimal angle) {
         angle = normalizeAngle(angle);
         if (angle.doubleValue() == 0) {
@@ -63,6 +85,11 @@ public class TrigonometricFunction {
         }
     }
 
+    /**
+     * Calculates the tangent of an angle.
+     * @param angle The angle in degrees.
+     * @return The tangent of the angle as a String.
+     */
     public static String handleTan(BigDecimal angle) {
         angle = normalizeAngle(angle);
         if (angle.doubleValue() == 0) {
@@ -86,6 +113,12 @@ public class TrigonometricFunction {
         }
     }
 
+    /**
+     * Calculates the arcsine (inverse sine) of a value.
+     * @param value The value for which to calculate the arcsine.
+     * @return The arcsine in degrees as a String.
+     * @throws IllegalArgumentException if the value is outside the domain [-1, 1].
+     */
     public static String handleAsin(BigDecimal value) {
         if (value.doubleValue() < -1 || value.doubleValue() > 1) {
             throw new IllegalArgumentException("Domain error");
@@ -102,6 +135,12 @@ public class TrigonometricFunction {
         return String.valueOf(Math.toDegrees(Math.asin(value.doubleValue())));
     }
 
+    /**
+     * Calculates the arccosine (inverse cosine) of a value.
+     * @param value The value for which to calculate the arccosine.
+     * @return The arccosine in degrees as a String.
+     * @throws IllegalArgumentException if the value is outside the domain [-1, 1].
+     */
     public static String handleAcos(BigDecimal value) {
         if (value.doubleValue() < -1 || value.doubleValue() > 1) {
             throw new IllegalArgumentException("Domain error");
@@ -118,6 +157,11 @@ public class TrigonometricFunction {
         return String.valueOf(Math.toDegrees(Math.acos(value.doubleValue())));
     }
 
+    /**
+     * Calculates the arctangent (inverse tangent) of a value.
+     * @param value The value for which to calculate the arctangent.
+     * @return The arctangent in degrees as a String.
+     */
     public static String handleAtan(String value) {
         if (value.equals("Infinity")) {
             return "90"; // atan(∞) = 90 degrees
