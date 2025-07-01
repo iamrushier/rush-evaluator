@@ -9,6 +9,7 @@ public class RushEvaluatorTest {
     @Test
     void testValidateExpression() {
         assertEquals("2+3", ExpressionValidator.validateExpression("2 + 3"));
+        assertEquals("(2)*(2)*(2)*((2))", ExpressionValidator.validateExpression("(2)(2)(2)((2))"));
         assertEquals("2*3", ExpressionValidator.validateExpression("2×3"));
         assertEquals("10*(1/100)+5", ExpressionValidator.validateExpression("10% + 5"));
         assertEquals("(2)*(3)", ExpressionValidator.validateExpression("(2)(3)"));
@@ -36,6 +37,7 @@ public class RushEvaluatorTest {
         assertEquals("2.718281828459045", RushEvaluator.evaluate("e"));
         assertEquals("1.0E+100", RushEvaluator.evaluate("10^100"));
         assertEquals("∞", RushEvaluator.evaluate("1/0"));
+        assertEquals("0.0", RushEvaluator.evaluate("1/tan(90)"));
         // Invalid expressions
         assertThrows(NumberFormatException.class, () -> RushEvaluator.evaluate("0/0"));
         assertThrows(StringIndexOutOfBoundsException.class, () -> RushEvaluator.evaluate("2+"));
