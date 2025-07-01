@@ -8,14 +8,30 @@ import in.iamrushier.evaluator.util.Constants;
 
 import java.math.BigDecimal;
 
+/**
+ * {@code ExpressionParser} is responsible for parsing and evaluating mathematical expressions.
+ * It uses a recursive descent parser to handle different levels of operator precedence.
+ */
 public class ExpressionParser {
     private int index = 0;
 
+    /**
+     * Parses and evaluates the given mathematical expression.
+     * This is the entry point for the parsing process.
+     *
+     * @param expression The mathematical expression string to parse.
+     * @return The result of the parsed expression as a String.
+     */
     public String parse(String expression) {
         index = 0;
         return parseExpression(expression);
     }
 
+    /**
+     * Parses an expression, handling addition and subtraction.
+     * @param expression The full expression string.
+     * @return The result of the expression as a String.
+     */
     private String parseExpression(String expression) {
         String result = parseTerm(expression);
         while (index < expression.length()) {
@@ -31,6 +47,11 @@ public class ExpressionParser {
         return result;
     }
 
+    /**
+     * Parses a term, handling multiplication and division.
+     * @param expression The full expression string.
+     * @return The result of the term as a String.
+     */
     private String parseTerm(String expression) {
         String result = parsePower(expression);
         while (index < expression.length()) {
@@ -46,6 +67,11 @@ public class ExpressionParser {
         return result;
     }
 
+    /**
+     * Parses a power operation, handling exponentiation.
+     * @param expression The full expression string.
+     * @return The result of the power operation as a String.
+     */
     private String parsePower(String expression) {
         String result = parseFactor(expression);
         while (index < expression.length()) {
@@ -61,10 +87,22 @@ public class ExpressionParser {
         return result;
     }
 
+    /**
+     * Checks if the current index is valid and the character at the index matches the given character.
+     * @param index The current index.
+     * @param expression The expression string.
+     * @param character The character to match.
+     * @return True if the index is valid and the character matches, false otherwise.
+     */
     private boolean isIndexValidAndCharIs(int index, String expression, char character) {
         return index < expression.length() && expression.charAt(index) == character;
     }
 
+    /**
+     * Parses a factor, which can be a number, a parenthesized expression, a constant, or a function.
+     * @param expression The full expression string.
+     * @return The result of the factor as a String.
+     */
     private String parseFactor(String expression) {
         String result;
         boolean isNegative = false;
@@ -79,13 +117,13 @@ public class ExpressionParser {
             if (isIndexValidAndCharIs(index, expression, ')')) {
                 index++;
             }
-        } else if (isIndexValidAndCharIs(index, expression, 'π')) {
+        } else if (isIndexValidAndCharIs(index, expression, '\u03c0')) {
             index++;
             result = Constants.PI.toPlainString();
         } else if (isIndexValidAndCharIs(index, expression, 'e')) {
             index++;
             result = Constants.EULER.toPlainString();
-        } else if (isIndexValidAndCharIs(index, expression, '∞')) {
+        } else if (isIndexValidAndCharIs(index, expression, '\u221e')) {
             index++;
             result = "Infinity";
         } else if (Character.isLetter(expression.charAt(index))) {
@@ -103,6 +141,11 @@ public class ExpressionParser {
         return isNegative ? "-" + result : result;
     }
 
+    /**
+     * Parses a number from the expression string.
+     * @param expression The full expression string.
+     * @return The parsed number as a String.
+     */
     private String parseNumber(String expression) {
         StringBuilder number = new StringBuilder();
         boolean hasDecimal = false;
@@ -136,6 +179,12 @@ public class ExpressionParser {
         return number.toString();
     }
 
+    /**
+     * Parses a function call from the expression string.
+     * @param expression The full expression string.
+     * @return The result of the function call as a String.
+     * @throws IllegalArgumentException if the function is unknown or the syntax is invalid.
+     */
     private String parseFunction(String expression) {
         StringBuilder functionName = new StringBuilder();
         while (index < expression.length() && Character.isLetter(expression.charAt(index))) {
