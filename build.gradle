@@ -1,0 +1,70 @@
+plugins {
+    id 'java-library'
+    id 'maven-publish'
+    id 'signing'
+}
+
+group = 'in.iamrushier'
+version = '1.0.0'
+
+sourceCompatibility = '1.8'
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    testImplementation 'org.junit.jupiter:junit-jupiter-api:5.8.1'
+    testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.8.1'
+}
+
+test {
+    useJUnitPlatform()
+}
+
+java {
+    withJavadocJar()
+    withSourcesJar()
+}
+
+publishing {
+    publications {
+        mavenJava(MavenPublication) {
+            from components.java
+
+            pom {
+                name = 'RushEvaluator'
+                description = 'A powerful and flexible mathematical expression evaluator for Java.'
+                url = 'https://github.com/iamrushier/rush-evaluator'
+                licenses {
+                    license {
+                        name = 'The Apache License, Version 2.0'
+                        url = 'http://www.apache.org/licenses/LICENSE-2.0.txt'
+                    }
+                }
+                developers {
+                    developer {
+                        id = 'iamrushier'
+                        name = 'Rushikesh Surve'
+                        email = '101.rushikesh.mail@gmail.com'
+                    }
+                }
+                scm {
+                    connection = 'scm:git:git://github.com/iamrushier/rush-evaluator.git'
+                    developerConnection = 'scm:git:ssh://github.com/iamrushier/rush-evaluator.git'
+                    url = 'https://github.com/iamrushier/rush-evaluator'
+                }
+            }
+        }
+    }
+    repositories {
+        maven {
+            name = "GitHubPackages"
+            url = uri("https://maven.pkg.github.com/iamrushier/rush-evaluator")
+            credentials {
+                username = System.getenv("GITHUB_ACTOR")
+                password = System.getenv("GITHUB_TOKEN")
+            }
+        }
+    }
+}
