@@ -1,0 +1,36 @@
+Run ./gradlew publish
+Downloading https://services.gradle.org/distributions/gradle-8.10-bin.zip
+.............10%.............20%.............30%.............40%.............50%.............60%.............70%.............80%.............90%.............100%
+Welcome to Gradle 8.10!
+Here are the highlights of this release:
+ - Support for Java 23
+ - Faster configuration cache
+ - Better configuration cache reports
+For more details see https://docs.gradle.org/8.10/release-notes.html
+Starting a Gradle Daemon (subsequent builds will be faster)
+> Task :compileJava
+> Task :processResources NO-SOURCE
+> Task :classes
+> Task :jar
+> Task :javadoc
+> Task :javadocJar
+> Task :sourcesJar
+> Task :generateMetadataFileForMavenJavaPublication
+> Task :generatePomFileForMavenJavaPublication
+> Task :publishMavenJavaPublicationToGitHubPackagesRepository FAILED
+Deprecated Gradle features were used in this build, making it incompatible with Gradle 9.0.
+FAILURE: Build failed with an exception.
+* What went wrong:
+Execution failed for task ':publishMavenJavaPublicationToGitHubPackagesRepository'.
+> Failed to publish publication 'mavenJava' to repository 'GitHubPackages'
+   > Could not PUT 'https://maven.pkg.github.com/iamrushier/rush-evaluator/in/iamrushier/RushEvaluator/1.0.0/RushEvaluator-1.0.0.jar'. Received status code 422 from server: Unprocessable Entity
+* Try:
+> Run with --stacktrace option to get the stack trace.
+> Run with --info or --debug option to get more log output.
+> Run with --scan to get full insights.
+> Get more help at https://help.gradle.org.
+You can use '--warning-mode all' to show the individual deprecation warnings and determine if they come from your own scripts or plugins.
+BUILD FAILED in 15s
+For more on this, please refer to https://docs.gradle.org/8.10/userguide/command_line_interface.html#sec:command_line_warnings in the Gradle documentation.
+8 actionable tasks: 8 executed
+Error: Process completed with exit code 1.
