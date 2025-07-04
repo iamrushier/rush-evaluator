@@ -16,7 +16,7 @@ RushEvaluator is a powerful and flexible mathematical expression evaluator for J
 To evaluate an expression, simply call the static `evaluate` method in the `RushEvaluator` class:
 
 ```java
-import in.iamrushier.evaluator.RushEvaluator;
+import io.github.iamrushier.evaluator.RushEvaluator;
 
 public class Example {
     public static void main(String[] args) {
