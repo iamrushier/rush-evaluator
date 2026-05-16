@@ -38,6 +38,10 @@ public class ExpressionParser {
             char operator = expression.charAt(index);
             if (operator == '+' || operator == '-') {
                 index++;
+                // In a calculator, an operator cannot be followed by another operator
+                if (index < expression.length() && (expression.charAt(index) == '+' || expression.charAt(index) == '-' || expression.charAt(index) == '*' || expression.charAt(index) == '/' || expression.charAt(index) == '^')) {
+                    throw new NumberFormatException("Invalid expression");
+                }
                 String nextTerm = parseTerm(expression);
                 result = BasicOperator.evaluateOperation(result, nextTerm, operator);
             } else {
@@ -58,6 +62,10 @@ public class ExpressionParser {
             char operator = expression.charAt(index);
             if (operator == '*' || operator == '/') {
                 index++;
+                // In a calculator, an operator cannot be followed by another operator
+                if (index < expression.length() && (expression.charAt(index) == '+' || expression.charAt(index) == '-' || expression.charAt(index) == '*' || expression.charAt(index) == '/' || expression.charAt(index) == '^')) {
+                    throw new NumberFormatException("Invalid expression");
+                }
                 String nextFactor = parsePower(expression);
                 result = BasicOperator.evaluateOperation(result, nextFactor, operator);
             } else {
@@ -78,6 +86,10 @@ public class ExpressionParser {
             char operator = expression.charAt(index);
             if (operator == '^') {
                 index++;
+                // In a calculator, an operator cannot be followed by another operator
+                if (index < expression.length() && (expression.charAt(index) == '+' || expression.charAt(index) == '-' || expression.charAt(index) == '*' || expression.charAt(index) == '/' || expression.charAt(index) == '^')) {
+                    throw new NumberFormatException("Invalid expression");
+                }
                 String exponent = parseFactor(expression);
                 result = PowerOperator.power(result, exponent);
             } else {
@@ -106,9 +118,16 @@ public class ExpressionParser {
     private String parseFactor(String expression) {
         String result;
         boolean isNegative = false;
-        if (isIndexValidAndCharIs(index, expression, '+')) {
+
+        // Support only ONE leading + or - sign (e.g., -5, (-5), sin(-30))
+        if (index < expression.length() && (expression.charAt(index) == '+' || expression.charAt(index) == '-')) {
             isNegative = expression.charAt(index) == '-';
             index++;
+            
+            // Reject double signs at the start of a factor (e.g., "--2")
+            if (index < expression.length() && (expression.charAt(index) == '+' || expression.charAt(index) == '-')) {
+                throw new NumberFormatException("Invalid expression");
+            }
         }
 
         if (isIndexValidAndCharIs(index, expression, '(')) {
@@ -126,10 +145,13 @@ public class ExpressionParser {
         } else if (isIndexValidAndCharIs(index, expression, '\u221e')) {
             index++;
             result = "Infinity";
-        } else if (Character.isLetter(expression.charAt(index))) {
+        } else if (index < expression.length() && Character.isLetter(expression.charAt(index))) {
             result = parseFunction(expression);
         } else {
             result = parseNumber(expression);
+            if (result.isEmpty()) {
+                throw new NumberFormatException("Invalid expression");
+            }
         }
 
         while (isIndexValidAndCharIs(index, expression, '^')) {
@@ -138,7 +160,7 @@ public class ExpressionParser {
             result = PowerOperator.power(result, exponent);
         }
 
-        return isNegative ? "-" + result : result;
+        return isNegative ? BasicOperator.evaluateOperation("0", result, '-') : result;
     }
 
     /**

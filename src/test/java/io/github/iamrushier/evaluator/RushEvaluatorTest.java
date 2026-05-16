@@ -40,6 +40,6 @@ public class RushEvaluatorTest {
         assertEquals("0.0", RushEvaluator.evaluate("1/tan(90)"));
         // Invalid expressions
         assertThrows(NumberFormatException.class, () -> RushEvaluator.evaluate("0/0"));
-        assertThrows(StringIndexOutOfBoundsException.class, () -> RushEvaluator.evaluate("2+"));
+        assertThrows(NumberFormatException.class, () -> RushEvaluator.evaluate("2+"));
     }
 }
