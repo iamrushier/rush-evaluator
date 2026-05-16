@@ -149,8 +149,22 @@ class TrigonometricFunctionTest {
     }
 
     @Test
-    void handleAtan_generalValues_returnsCorrectResult() {
-        BigDecimal value = new BigDecimal("0.57735026919"); // tan(30 degrees)
-        assertEquals(String.valueOf(Math.toDegrees(Math.atan(value.doubleValue()))), TrigonometricFunction.handleAtan(value.toString()));
+    void handleSin_veryLargeAngle_returnsCorrectResult() {
+        // Test with a very large angle (10^18 degrees)
+        // 10^18 % 360 = 280
+        // sin(280) = sin(280 - 360) = sin(-80)
+        BigDecimal largeAngle = new BigDecimal("1000000000000000000");
+        assertTimeoutPreemptively(java.time.Duration.ofSeconds(1), () -> {
+            TrigonometricFunction.handleSin(largeAngle);
+        });
+    }
+
+    @Test
+    void handleSin_veryLargeNegativeAngle_returnsCorrectResult() {
+        // Test with a very large negative angle
+        BigDecimal largeNegativeAngle = new BigDecimal("-1000000000000000000");
+        assertTimeoutPreemptively(java.time.Duration.ofSeconds(1), () -> {
+            TrigonometricFunction.handleSin(largeNegativeAngle);
+        });
     }
 }

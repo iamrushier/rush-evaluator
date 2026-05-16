@@ -19,12 +19,10 @@ public class TrigonometricFunction {
      * @return The normalized angle.
      */
     private static BigDecimal normalizeAngle(BigDecimal angle) {
-        BigDecimal normalized = angle;
-        while (normalized.doubleValue() >= 360) {
-            normalized = normalized.subtract(BigDecimal.valueOf(360));
-        }
-        while (normalized.doubleValue() < 0) {
-            normalized = normalized.add(BigDecimal.valueOf(360));
+        BigDecimal circle = BigDecimal.valueOf(360);
+        BigDecimal normalized = angle.remainder(circle);
+        if (normalized.compareTo(BigDecimal.ZERO) < 0) {
+            normalized = normalized.add(circle);
         }
         return normalized;
     }
