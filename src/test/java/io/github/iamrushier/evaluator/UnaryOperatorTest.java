@@ -7,13 +7,13 @@ public class UnaryOperatorTest {
 
     @Test
     void testSimpleNegativeNumber() {
-        assertEquals("-2.0", RushEvaluator.evaluate("-2"));
+        assertEquals("-2", RushEvaluator.evaluate("-2"));
     }
 
     @Test
     void testNegativeNumberInExpression() {
-        assertEquals("2.0", RushEvaluator.evaluate("5+(-3)"));
-        assertEquals("8.0", RushEvaluator.evaluate("5 - (-3)"));
+        assertEquals("2", RushEvaluator.evaluate("5+(-3)"));
+        assertEquals("8", RushEvaluator.evaluate("5 - (-3)"));
     }
 
     @Test
@@ -23,7 +23,7 @@ public class UnaryOperatorTest {
 
     @Test
     void testNegativeConstant() {
-        String pi = "3.141592653589793";
+        String pi = "3.14159265358979323846264338327950288419716939937510";
         assertEquals("-" + pi, RushEvaluator.evaluate("-π"));
     }
 

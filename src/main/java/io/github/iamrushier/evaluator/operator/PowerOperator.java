@@ -1,6 +1,7 @@
 package io.github.iamrushier.evaluator.operator;
 
 import io.github.iamrushier.evaluator.util.CalculationEngine;
+import io.github.iamrushier.evaluator.util.Operand;
 
 import java.math.BigDecimal;
 import java.math.MathContext;
@@ -27,6 +28,7 @@ public class PowerOperator {
      * @throws NumberFormatException if both base and exponent are zero (undefined).
      */
     public static String power(String baseStr, String exponentStr) {
-        return CalculationEngine.power(baseStr, exponentStr);
+        Operand result = CalculationEngine.power(Operand.of(baseStr), Operand.of(exponentStr));
+        return result.toString();
     }
 }

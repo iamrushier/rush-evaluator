@@ -1,6 +1,7 @@
 package io.github.iamrushier.evaluator.operator;
 
 import io.github.iamrushier.evaluator.util.CalculationEngine;
+import io.github.iamrushier.evaluator.util.Operand;
 
 import java.math.BigDecimal;
 import java.math.MathContext;
@@ -28,6 +29,7 @@ public class BasicOperator {
      * @throws ArithmeticException if an invalid operator is provided or a division by zero occurs.
      */
     public static String evaluateOperation(String leftStr, String rightStr, char operator) {
-        return CalculationEngine.calculate(leftStr, rightStr, operator);
+        Operand result = CalculationEngine.calculate(Operand.of(leftStr), Operand.of(rightStr), operator);
+        return result.toString();
     }
 }

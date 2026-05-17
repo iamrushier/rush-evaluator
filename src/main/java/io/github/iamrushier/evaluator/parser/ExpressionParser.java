@@ -2,9 +2,9 @@ package io.github.iamrushier.evaluator.parser;
 
 import io.github.iamrushier.evaluator.function.LogarithmicFunction;
 import io.github.iamrushier.evaluator.function.TrigonometricFunction;
-import io.github.iamrushier.evaluator.operator.BasicOperator;
-import io.github.iamrushier.evaluator.operator.PowerOperator;
+import io.github.iamrushier.evaluator.util.CalculationEngine;
 import io.github.iamrushier.evaluator.util.Constants;
+import io.github.iamrushier.evaluator.util.Operand;
 
 import java.math.BigDecimal;
 
@@ -24,16 +24,16 @@ public class ExpressionParser {
      */
     public String parse(String expression) {
         index = 0;
-        return parseExpression(expression);
+        return parseExpression(expression).toString();
     }
 
     /**
      * Parses an expression, handling addition and subtraction.
      * @param expression The full expression string.
-     * @return The result of the expression as a String.
+     * @return The result of the expression as an Operand.
      */
-    private String parseExpression(String expression) {
-        String result = parseTerm(expression);
+    private Operand parseExpression(String expression) {
+        Operand result = parseTerm(expression);
         while (index < expression.length()) {
             char operator = expression.charAt(index);
             if (operator == '+' || operator == '-') {
@@ -42,8 +42,8 @@ public class ExpressionParser {
                 if (index < expression.length() && (expression.charAt(index) == '+' || expression.charAt(index) == '-' || expression.charAt(index) == '*' || expression.charAt(index) == '/' || expression.charAt(index) == '^')) {
                     throw new NumberFormatException("Invalid expression");
                 }
-                String nextTerm = parseTerm(expression);
-                result = BasicOperator.evaluateOperation(result, nextTerm, operator);
+                Operand nextTerm = parseTerm(expression);
+                result = CalculationEngine.calculate(result, nextTerm, operator);
             } else {
                 break;
             }
@@ -54,10 +54,10 @@ public class ExpressionParser {
     /**
      * Parses a term, handling multiplication and division.
      * @param expression The full expression string.
-     * @return The result of the term as a String.
+     * @return The result of the term as an Operand.
      */
-    private String parseTerm(String expression) {
-        String result = parsePower(expression);
+    private Operand parseTerm(String expression) {
+        Operand result = parsePower(expression);
         while (index < expression.length()) {
             char operator = expression.charAt(index);
             if (operator == '*' || operator == '/') {
@@ -66,8 +66,8 @@ public class ExpressionParser {
                 if (index < expression.length() && (expression.charAt(index) == '+' || expression.charAt(index) == '-' || expression.charAt(index) == '*' || expression.charAt(index) == '/' || expression.charAt(index) == '^')) {
                     throw new NumberFormatException("Invalid expression");
                 }
-                String nextFactor = parsePower(expression);
-                result = BasicOperator.evaluateOperation(result, nextFactor, operator);
+                Operand nextFactor = parsePower(expression);
+                result = CalculationEngine.calculate(result, nextFactor, operator);
             } else {
                 break;
             }
@@ -78,10 +78,10 @@ public class ExpressionParser {
     /**
      * Parses a power operation, handling exponentiation.
      * @param expression The full expression string.
-     * @return The result of the power operation as a String.
+     * @return The result of the power operation as an Operand.
      */
-    private String parsePower(String expression) {
-        String result = parseFactor(expression);
+    private Operand parsePower(String expression) {
+        Operand result = parseFactor(expression);
         while (index < expression.length()) {
             char operator = expression.charAt(index);
             if (operator == '^') {
@@ -90,8 +90,8 @@ public class ExpressionParser {
                 if (index < expression.length() && (expression.charAt(index) == '+' || expression.charAt(index) == '-' || expression.charAt(index) == '*' || expression.charAt(index) == '/' || expression.charAt(index) == '^')) {
                     throw new NumberFormatException("Invalid expression");
                 }
-                String exponent = parseFactor(expression);
-                result = PowerOperator.power(result, exponent);
+                Operand exponent = parseFactor(expression);
+                result = CalculationEngine.power(result, exponent);
             } else {
                 break;
             }
@@ -113,10 +113,10 @@ public class ExpressionParser {
     /**
      * Parses a factor, which can be a number, a parenthesized expression, a constant, or a function.
      * @param expression The full expression string.
-     * @return The result of the factor as a String.
+     * @return The result of the factor as an Operand.
      */
-    private String parseFactor(String expression) {
-        String result;
+    private Operand parseFactor(String expression) {
+        Operand result;
         boolean isNegative = false;
 
         // Support only ONE leading + or - sign (e.g., -5, (-5), sin(-30))
@@ -138,29 +138,30 @@ public class ExpressionParser {
             }
         } else if (isIndexValidAndCharIs(index, expression, '\u03c0')) {
             index++;
-            result = Constants.PI.toPlainString();
+            result = new Operand(Constants.PI);
         } else if (isIndexValidAndCharIs(index, expression, 'e')) {
             index++;
-            result = Constants.EULER.toPlainString();
+            result = new Operand(Constants.EULER);
         } else if (isIndexValidAndCharIs(index, expression, '\u221e')) {
             index++;
-            result = "Infinity";
+            result = new Operand(Double.POSITIVE_INFINITY);
         } else if (index < expression.length() && Character.isLetter(expression.charAt(index))) {
             result = parseFunction(expression);
         } else {
-            result = parseNumber(expression);
-            if (result.isEmpty()) {
+            String number = parseNumber(expression);
+            if (number.isEmpty()) {
                 throw new NumberFormatException("Invalid expression");
             }
+            result = Operand.of(number);
         }
 
         while (isIndexValidAndCharIs(index, expression, '^')) {
             index++;
-            String exponent = parseFactor(expression);
-            result = PowerOperator.power(result, exponent);
+            Operand exponent = parseFactor(expression);
+            result = CalculationEngine.power(result, exponent);
         }
 
-        return isNegative ? BasicOperator.evaluateOperation("0", result, '-') : result;
+        return isNegative ? CalculationEngine.calculate(new Operand(BigDecimal.ZERO), result, '-') : result;
     }
 
     /**
@@ -204,10 +205,10 @@ public class ExpressionParser {
     /**
      * Parses a function call from the expression string.
      * @param expression The full expression string.
-     * @return The result of the function call as a String.
+     * @return The result of the function call as an Operand.
      * @throws IllegalArgumentException if the function is unknown or the syntax is invalid.
      */
-    private String parseFunction(String expression) {
+    private Operand parseFunction(String expression) {
         StringBuilder functionName = new StringBuilder();
         while (index < expression.length() && Character.isLetter(expression.charAt(index))) {
             functionName.append(expression.charAt(index));
@@ -216,28 +217,28 @@ public class ExpressionParser {
 
         if (isIndexValidAndCharIs(index, expression, '(')) {
             index++;
-            String argument = parseExpression(expression);
+            Operand argument = parseExpression(expression);
             if (isIndexValidAndCharIs(index, expression, ')')) {
                 index++;
             }
 
             switch (functionName.toString()) {
                 case "sin":
-                    return TrigonometricFunction.handleSin(new BigDecimal(argument));
+                    return new Operand(Double.parseDouble(TrigonometricFunction.handleSin(argument.getAsBigDecimal())));
                 case "cos":
-                    return TrigonometricFunction.handleCos(new BigDecimal(argument));
+                    return new Operand(Double.parseDouble(TrigonometricFunction.handleCos(argument.getAsBigDecimal())));
                 case "tan":
-                    return TrigonometricFunction.handleTan(new BigDecimal(argument));
+                    return new Operand(Double.parseDouble(TrigonometricFunction.handleTan(argument.getAsBigDecimal())));
                 case "asin":
-                    return TrigonometricFunction.handleAsin(new BigDecimal(argument));
+                    return new Operand(Double.parseDouble(TrigonometricFunction.handleAsin(argument.getAsBigDecimal())));
                 case "acos":
-                    return TrigonometricFunction.handleAcos(new BigDecimal(argument));
+                    return new Operand(Double.parseDouble(TrigonometricFunction.handleAcos(argument.getAsBigDecimal())));
                 case "atan":
-                    return TrigonometricFunction.handleAtan(argument);
+                    return new Operand(Double.parseDouble(TrigonometricFunction.handleAtan(argument.toString())));
                 case "log":
-                    return LogarithmicFunction.handleLog(new BigDecimal(argument));
+                    return new Operand(Double.parseDouble(LogarithmicFunction.handleLog(argument.getAsBigDecimal())));
                 case "ln":
-                    return LogarithmicFunction.handleLn(new BigDecimal(argument));
+                    return new Operand(Double.parseDouble(LogarithmicFunction.handleLn(argument.getAsBigDecimal())));
                 default:
                     throw new IllegalArgumentException("Invalid expression");
             }

@@ -20,24 +20,24 @@ public class RushEvaluatorTest {
     @Test
     void testEvaluate() {
         // Valid expressions
-        assertEquals("5.0", RushEvaluator.evaluate("2+3"));
-        assertEquals("5.0", RushEvaluator.evaluate("10-5"));
-        assertEquals("6.0", RushEvaluator.evaluate("2*3"));
-        assertEquals("5.0", RushEvaluator.evaluate("10/2"));
-        assertEquals("8.0", RushEvaluator.evaluate("2^3"));
+        assertEquals("5", RushEvaluator.evaluate("2+3"));
+        assertEquals("5", RushEvaluator.evaluate("10-5"));
+        assertEquals("6", RushEvaluator.evaluate("2*3"));
+        assertEquals("5", RushEvaluator.evaluate("10/2"));
+        assertEquals("8", RushEvaluator.evaluate("2^3"));
         assertEquals("0.5", RushEvaluator.evaluate("sin(30)"));
-        assertEquals("0.5", RushEvaluator.evaluate("cos(60)"));
-        assertEquals("1.0", RushEvaluator.evaluate("tan(45)"));
-        assertEquals("2.0", RushEvaluator.evaluate("log(100)"));
-        assertEquals("1.0", RushEvaluator.evaluate("ln(e)"));
-        assertEquals("30.0", RushEvaluator.evaluate("asin(0.5)"));
-        assertEquals("60.0", RushEvaluator.evaluate("acos(0.5)"));
-        assertEquals("45.0", RushEvaluator.evaluate("atan(1)"));
-        assertEquals("3.141592653589793", RushEvaluator.evaluate("π"));
-        assertEquals("2.718281828459045", RushEvaluator.evaluate("e"));
-        assertEquals("1.0E+100", RushEvaluator.evaluate("10^100"));
+        assertEquals("-0.5", RushEvaluator.evaluate("cos(120)"));
+        assertEquals("1", RushEvaluator.evaluate("tan(45)"));
+        assertEquals("2", RushEvaluator.evaluate("log(100)"));
+        assertEquals("1", RushEvaluator.evaluate("ln(e)"));
+        assertEquals("30", RushEvaluator.evaluate("asin(0.5)"));
+        assertEquals("60", RushEvaluator.evaluate("acos(0.5)"));
+        assertEquals("45", RushEvaluator.evaluate("atan(1)"));
+        assertEquals("3.14159265358979323846264338327950288419716939937510", RushEvaluator.evaluate("π"));
+        assertEquals("2.71828182845904523536028747135266249775724709369995", RushEvaluator.evaluate("e"));
+        assertEquals("10000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000", RushEvaluator.evaluate("10^100"));
         assertEquals("∞", RushEvaluator.evaluate("1/0"));
-        assertEquals("0.0", RushEvaluator.evaluate("1/tan(90)"));
+        assertEquals("0", RushEvaluator.evaluate("1/tan(90)"));
         // Invalid expressions
         assertThrows(NumberFormatException.class, () -> RushEvaluator.evaluate("0/0"));
         assertThrows(NumberFormatException.class, () -> RushEvaluator.evaluate("2+"));

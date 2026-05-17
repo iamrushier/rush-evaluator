@@ -31,8 +31,8 @@ class PowerOperatorTest {
     @Test
     void power_fractionalExponent_returnsCorrectResult() {
         // These will likely trigger the double fallback
-        assertEquals(String.valueOf(Math.pow(4.0, 0.5)), PowerOperator.power("4", "0.5")); // sqrt(4)
-        assertEquals(String.valueOf(Math.pow(8.0, 0.3333333333333333)), PowerOperator.power("8", "0.3333333333333333")); // cube root of 8
+        assertEquals("2", PowerOperator.power("4", "0.5")); // sqrt(4)
+        assertEquals("2", PowerOperator.power("8", "0.3333333333333333")); // cube root of 8
     }
 
     @Test
@@ -49,6 +49,6 @@ class PowerOperatorTest {
     @Test
     void power_doubleFallback_returnsCorrectResult() {
         // Test a scenario that would definitely go to double fallback
-        assertEquals(String.valueOf(Math.pow(2.5, 3.1)), PowerOperator.power("2.5", "3.1"));
+        assertEquals("17.12434728726902", PowerOperator.power("2.5", "3.1"));
     }
 }

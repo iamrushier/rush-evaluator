@@ -40,26 +40,8 @@ public class RushEvaluator {
         if (resultString.equals("NaN")) {
             throw new NumberFormatException("Undefined");
         }
-        // Check for extremely large numbers that might exceed double precision
-        if (!resultString.contains("Infinity") && !resultString.contains("-Infinity")) {
-            try {
-                BigDecimal bd = new BigDecimal(resultString);
-                if (bd.abs().compareTo(BigDecimal.valueOf(Math.pow(10, 308))) > 0)
-                    return "Can't calculate";
-            } catch (Exception e) {
-                throw new IllegalArgumentException("Invalid expression");
-            }
-        }
-        // Format the result for consistent scientific notation
-        try {
-            BigDecimal bd = new BigDecimal(resultString);
-            return OutputFormatter.consistentScientific(String.valueOf(bd.doubleValue()));
-        } catch (Exception e) {
-            // Fallback for cases where BigDecimal conversion might fail but Double.parseDouble works
-            double result = Double.parseDouble(resultString);
-            resultString = String.valueOf(result);
-            resultString = OutputFormatter.consistentScientific(resultString);
-            return resultString.replace("Infinity", "∞");
-        }
+        
+        // Return result directly as parser/operand now handles formatting consistently
+        return resultString;
     }
 }
