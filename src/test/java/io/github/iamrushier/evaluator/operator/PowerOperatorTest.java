@@ -1,5 +1,6 @@
 package io.github.iamrushier.evaluator.operator;
 
+import io.github.iamrushier.evaluator.exception.DomainException;
 import org.junit.jupiter.api.Test;
 import java.math.BigDecimal;
 
@@ -21,8 +22,8 @@ class PowerOperatorTest {
     }
 
     @Test
-    void power_zeroBaseZeroExponent_throwsNumberFormatException() {
-        NumberFormatException thrown = assertThrows(NumberFormatException.class, () -> {
+    void power_zeroBaseZeroExponent_throwsDomainException() {
+        DomainException thrown = assertThrows(DomainException.class, () -> {
             PowerOperator.power("0", "0");
         });
         assertEquals("Undefined", thrown.getMessage());

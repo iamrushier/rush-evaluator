@@ -1,5 +1,6 @@
 package io.github.iamrushier.evaluator.operator;
 
+import io.github.iamrushier.evaluator.exception.SyntaxException;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -37,8 +38,8 @@ class BasicOperatorTest {
     }
 
     @Test
-    void evaluateOperation_invalidOperator_throwsArithmeticException() {
-        assertThrows(ArithmeticException.class, () -> {
+    void evaluateOperation_invalidOperator_throwsSyntaxException() {
+        assertThrows(SyntaxException.class, () -> {
             BasicOperator.evaluateOperation("2", "3", '%');
         });
     }

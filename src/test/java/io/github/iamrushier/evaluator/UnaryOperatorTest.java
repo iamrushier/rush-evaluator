@@ -1,5 +1,6 @@
 package io.github.iamrushier.evaluator;
 
+import io.github.iamrushier.evaluator.exception.SyntaxException;
 import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -30,8 +31,8 @@ public class UnaryOperatorTest {
     @Test
     void testInvalidDoubleNegative_ThrowsException() {
         // These should be rejected as syntax errors in a standard calculator
-        assertThrows(RuntimeException.class, () -> RushEvaluator.evaluate("--2"));
-        assertThrows(RuntimeException.class, () -> RushEvaluator.evaluate("5 - -3"));
-        assertThrows(RuntimeException.class, () -> RushEvaluator.evaluate("5 * -3"));
+        assertThrows(SyntaxException.class, () -> RushEvaluator.evaluate("--2"));
+        assertThrows(SyntaxException.class, () -> RushEvaluator.evaluate("5 - -3"));
+        assertThrows(SyntaxException.class, () -> RushEvaluator.evaluate("5 * -3"));
     }
 }

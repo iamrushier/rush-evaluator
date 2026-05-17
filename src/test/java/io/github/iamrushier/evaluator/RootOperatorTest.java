@@ -1,5 +1,6 @@
 package io.github.iamrushier.evaluator;
 
+import io.github.iamrushier.evaluator.exception.DomainException;
 import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -44,7 +45,7 @@ public class RootOperatorTest {
 
     @Test
     void testNegativeRoots() {
-        assertThrows(ArithmeticException.class, () -> RushEvaluator.evaluate("√-1"));
+        assertThrows(DomainException.class, () -> RushEvaluator.evaluate("√-1"));
         // Cube root of negative IS allowed in math
         assertEquals("-2", RushEvaluator.evaluate("∛-8"));
     }

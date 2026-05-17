@@ -1,5 +1,7 @@
 package io.github.iamrushier.evaluator;
 
+import io.github.iamrushier.evaluator.exception.DomainException;
+import io.github.iamrushier.evaluator.exception.SyntaxException;
 import io.github.iamrushier.evaluator.util.ExpressionValidator;
 import org.junit.jupiter.api.Test;
 
@@ -39,7 +41,7 @@ public class RushEvaluatorTest {
         assertEquals("∞", RushEvaluator.evaluate("1/0"));
         assertEquals("0", RushEvaluator.evaluate("1/tan(90)"));
         // Invalid expressions
-        assertThrows(NumberFormatException.class, () -> RushEvaluator.evaluate("0/0"));
-        assertThrows(NumberFormatException.class, () -> RushEvaluator.evaluate("2+"));
+        assertThrows(DomainException.class, () -> RushEvaluator.evaluate("0/0"));
+        assertThrows(SyntaxException.class, () -> RushEvaluator.evaluate("2+"));
     }
 }

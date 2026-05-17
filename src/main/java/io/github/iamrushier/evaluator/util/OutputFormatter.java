@@ -65,4 +65,15 @@ public class OutputFormatter {
             return result.toPlainString();
         }
     }
+
+    /**
+     * Formats a double value with a fixed precision and strips trailing zeros.
+     * @param value The double value to format.
+     * @return The formatted string.
+     */
+    public static String formatDouble(double value) {
+        if (Double.isInfinite(value)) return value > 0 ? "Infinity" : "-Infinity";
+        if (Double.isNaN(value)) return "NaN";
+        return BigDecimal.valueOf(value).setScale(10, RoundingMode.HALF_UP).stripTrailingZeros().toPlainString();
+    }
 }

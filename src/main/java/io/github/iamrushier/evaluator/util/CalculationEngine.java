@@ -1,5 +1,7 @@
 package io.github.iamrushier.evaluator.util;
 
+import io.github.iamrushier.evaluator.exception.DomainException;
+import io.github.iamrushier.evaluator.exception.SyntaxException;
 import io.github.iamrushier.evaluator.operator.BinaryOperator;
 
 import java.math.BigDecimal;
@@ -42,7 +44,13 @@ public class CalculationEngine {
                     // Fallback to double handled below
                 }
             }
-            return new Operand(left.getAsDouble() / right.getAsDouble());
+            double r = right.getAsDouble();
+            if (r == 0) {
+                double l = left.getAsDouble();
+                if (l == 0) return new Operand(Double.NaN);
+                return new Operand(l > 0 ? Double.POSITIVE_INFINITY : Double.NEGATIVE_INFINITY);
+            }
+            return new Operand(left.getAsDouble() / r);
         });
         // Register power operator as well to unify CalculationEngine
         operators.put('^', CalculationEngine::power);
@@ -56,7 +64,7 @@ public class CalculationEngine {
     public static Operand calculate(Operand left, Operand right, char operator) {
         BinaryOperator op = operators.get(operator);
         if (op == null) {
-            throw new ArithmeticException("Invalid expression");
+            throw new SyntaxException("Invalid expression");
         }
         return op.apply(left, right);
     }
@@ -71,7 +79,7 @@ public class CalculationEngine {
                 BigDecimal e = exponent.getAsBigDecimal();
                 
                 if (b.compareTo(BigDecimal.ZERO) == 0 && e.compareTo(BigDecimal.ZERO) == 0) {
-                    throw new NumberFormatException("Undefined");
+                    throw new DomainException("Undefined");
                 }
 
                 if (e.scale() == 0 && e.compareTo(BigDecimal.ZERO) >= 0) {
@@ -89,7 +97,7 @@ public class CalculationEngine {
         double b = base.getAsDouble();
         double e = exponent.getAsDouble();
         if (b == 0 && e == 0) {
-            throw new NumberFormatException("Undefined");
+            throw new DomainException("Undefined");
         }
         return new Operand(Math.pow(b, e));
     }
@@ -100,7 +108,7 @@ public class CalculationEngine {
     public static Operand sqrt(Operand operand) {
         double val = operand.getAsDouble();
         if (val < 0) {
-            throw new ArithmeticException("Domain error");
+            throw new DomainException("Domain error");
         }
         return new Operand(Math.sqrt(val));
     }

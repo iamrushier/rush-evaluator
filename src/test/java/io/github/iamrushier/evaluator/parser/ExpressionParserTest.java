@@ -1,5 +1,6 @@
 package io.github.iamrushier.evaluator.parser;
 
+import io.github.iamrushier.evaluator.exception.SyntaxException;
 import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -48,8 +49,6 @@ class ExpressionParserTest {
     @Test
     void parse_constants() {
         // Using approximate values for PI and EULER for comparison due to BigDecimal precision
-        // The actual values are handled by Constants class, so we just check if they are used.
-        // For simplicity, we'll check the result of a simple operation involving them.
         assertEquals("6.28318530717958647692528676655900576839433879875020", parser.parse("2*π"));
         assertEquals("3.71828182845904523536028747135266249775724709369995", parser.parse("e+1"));
         assertEquals("∞", parser.parse("∞-5"));
@@ -75,13 +74,6 @@ class ExpressionParserTest {
         assertEquals("27", parser.parse("(1+2)*3^2/sin(90)"));
     }
 
-//    @Test
-//    void parse_unaryMinus() {
-//        assertEquals("-5", parser.parse("-5"));
-//        assertEquals("-6", parser.parse("2*-3"));
-//        assertEquals("-3", parser.parse("-(1+2)"));
-//    }
-
     @Test
     void parse_scientificNotation() {
         assertEquals("100.2", parser.parse("1e2+2e-1"));
@@ -91,26 +83,26 @@ class ExpressionParserTest {
 
     @Test
     void parse_invalidExpression_missingOperand() {
-        assertThrows(Exception.class, () -> parser.parse("1+"));
+        assertThrows(SyntaxException.class, () -> parser.parse("1+"));
     }
 
     @Test
     void parse_invalidExpression_emptyFunctionArgument() {
-        assertThrows(Exception.class, () -> parser.parse("sin()"));
+        assertThrows(SyntaxException.class, () -> parser.parse("sin()"));
     }
 
     @Test
     void parse_invalidExpression_unclosedParenthesis() {
-        assertEquals("3", parser.parse("(1+2"));
+        assertThrows(SyntaxException.class, () -> parser.parse("(1+2"));
     }
 
     @Test
     void parse_invalidExpression_doubleOperator() {
-        assertThrows(Exception.class, () -> parser.parse("2**3"));
+        assertThrows(SyntaxException.class, () -> parser.parse("2**3"));
     }
 
     @Test
     void parse_invalidExpression_unknownFunction() {
-        assertThrows(IllegalArgumentException.class, () -> parser.parse("xyz(1)"));
+        assertThrows(SyntaxException.class, () -> parser.parse("xyz(1)"));
     }
 }
