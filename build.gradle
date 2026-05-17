@@ -1,10 +1,10 @@
 plugins {
     id 'java-library'
-    id 'com.vanniktech.maven.publish' version '0.30.0'
+    id 'com.vanniktech.maven.publish' version '0.36.0'
 }
 
 group = 'io.github.iamrushier'
-version = '2.0.3'
+version = '2.0.4'   // ← Update this before each release
 
 sourceCompatibility = '1.8'
 targetCompatibility = '1.8'
@@ -26,10 +26,9 @@ test {
     useJUnitPlatform()
 }
 
-// ==================== Maven Publishing ====================
-
+// Maven Central + Signing
 mavenPublishing {
-    publishToMavenCentral(com.vanniktech.maven.publish.SonatypeHost.CENTRAL_PORTAL)
+    mavenCentralPublishing = true     // Recommended way in 0.36.0
     signAllPublications()
 
     coordinates('io.github.iamrushier', 'rush-evaluator', version)
@@ -62,8 +61,7 @@ mavenPublishing {
     }
 }
 
-// ==================== GitHub Packages ====================
-
+// GitHub Packages
 publishing {
     repositories {
         maven {
@@ -74,19 +72,5 @@ publishing {
                 password = System.getenv('GITHUB_TOKEN')
             }
         }
-    }
-}
-
-// ==================== GPG Signing ====================
-
-signing {
-    def signingKey = System.getenv("GPG_SIGNING_KEY")
-    def signingPassphrase = System.getenv("GPG_PASSPHRASE")
-
-    if (signingKey?.trim()) {
-        useInMemoryPgpKeys(signingKey, signingPassphrase)
-        println "✅ GPG In-memory key loaded successfully"
-    } else {
-        println "⚠️  WARNING: GPG_SIGNING_KEY environment variable is missing"
     }
 }
