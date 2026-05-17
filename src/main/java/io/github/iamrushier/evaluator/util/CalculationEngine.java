@@ -1,7 +1,11 @@
 package io.github.iamrushier.evaluator.util;
 
+import io.github.iamrushier.evaluator.operator.BinaryOperator;
+
 import java.math.BigDecimal;
 import java.math.MathContext;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * {@code CalculationEngine} centralizes mathematical calculations with precision management.
@@ -9,37 +13,52 @@ import java.math.MathContext;
  */
 public class CalculationEngine {
 
+    private static final Map<Character, BinaryOperator> operators = new HashMap<>();
+
+    static {
+        operators.put('+', (left, right) -> {
+            if (left.isBigDecimal() && right.isBigDecimal()) {
+                return new Operand(left.getAsBigDecimal().add(right.getAsBigDecimal()));
+            }
+            return new Operand(left.getAsDouble() + right.getAsDouble());
+        });
+        operators.put('-', (left, right) -> {
+            if (left.isBigDecimal() && right.isBigDecimal()) {
+                return new Operand(left.getAsBigDecimal().subtract(right.getAsBigDecimal()));
+            }
+            return new Operand(left.getAsDouble() - right.getAsDouble());
+        });
+        operators.put('*', (left, right) -> {
+            if (left.isBigDecimal() && right.isBigDecimal()) {
+                return new Operand(left.getAsBigDecimal().multiply(right.getAsBigDecimal()));
+            }
+            return new Operand(left.getAsDouble() * right.getAsDouble());
+        });
+        operators.put('/', (left, right) -> {
+            if (left.isBigDecimal() && right.isBigDecimal()) {
+                try {
+                    return new Operand(left.getAsBigDecimal().divide(right.getAsBigDecimal(), MathContext.DECIMAL128));
+                } catch (ArithmeticException e) {
+                    // Fallback to double handled below
+                }
+            }
+            return new Operand(left.getAsDouble() / right.getAsDouble());
+        });
+        // Register power operator as well to unify CalculationEngine
+        operators.put('^', CalculationEngine::power);
+    }
+
     private CalculationEngine() {}
 
     /**
-     * Performs a basic arithmetic operation.
+     * Performs a binary arithmetic operation.
      */
     public static Operand calculate(Operand left, Operand right, char operator) {
-        if (left.isBigDecimal() && right.isBigDecimal()) {
-            try {
-                BigDecimal l = left.getAsBigDecimal();
-                BigDecimal r = right.getAsBigDecimal();
-                switch (operator) {
-                    case '+': return new Operand(l.add(r));
-                    case '-': return new Operand(l.subtract(r));
-                    case '*': return new Operand(l.multiply(r));
-                    case '/': return new Operand(l.divide(r, MathContext.DECIMAL128));
-                    default: throw new ArithmeticException("Invalid expression");
-                }
-            } catch (Exception e) {
-                // Fallback to double handled below
-            }
+        BinaryOperator op = operators.get(operator);
+        if (op == null) {
+            throw new ArithmeticException("Invalid expression");
         }
-
-        double l = left.getAsDouble();
-        double r = right.getAsDouble();
-        switch (operator) {
-            case '+': return new Operand(l + r);
-            case '-': return new Operand(l - r);
-            case '*': return new Operand(l * r);
-            case '/': return new Operand(l / r);
-            default: throw new ArithmeticException("Invalid expression");
-        }
+        return op.apply(left, right);
     }
 
     /**
@@ -73,11 +92,5 @@ public class CalculationEngine {
             throw new NumberFormatException("Undefined");
         }
         return new Operand(Math.pow(b, e));
-    }
-
-    private static String formatDouble(double value) {
-        String result = String.valueOf(value);
-        if (result.equals("NaN")) return "NaN";
-        return result; // Facade handles scientific notation and Infinity -> ∞
     }
 }

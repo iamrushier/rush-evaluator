@@ -1,10 +1,10 @@
 package io.github.iamrushier.evaluator.parser;
 
-import io.github.iamrushier.evaluator.function.LogarithmicFunction;
-import io.github.iamrushier.evaluator.function.TrigonometricFunction;
+import io.github.iamrushier.evaluator.function.Function;
 import io.github.iamrushier.evaluator.util.CalculationEngine;
 import io.github.iamrushier.evaluator.util.Constants;
 import io.github.iamrushier.evaluator.util.Operand;
+import io.github.iamrushier.evaluator.util.OperationRegistry;
 
 import java.math.BigDecimal;
 
@@ -91,7 +91,7 @@ public class ExpressionParser {
                     throw new NumberFormatException("Invalid expression");
                 }
                 Operand exponent = parseFactor(expression);
-                result = CalculationEngine.power(result, exponent);
+                result = CalculationEngine.calculate(result, exponent, '^');
             } else {
                 break;
             }
@@ -158,7 +158,7 @@ public class ExpressionParser {
         while (isIndexValidAndCharIs(index, expression, '^')) {
             index++;
             Operand exponent = parseFactor(expression);
-            result = CalculationEngine.power(result, exponent);
+            result = CalculationEngine.calculate(result, exponent, '^');
         }
 
         return isNegative ? CalculationEngine.calculate(new Operand(BigDecimal.ZERO), result, '-') : result;
@@ -211,7 +211,7 @@ public class ExpressionParser {
     private Operand parseFunction(String expression) {
         StringBuilder functionName = new StringBuilder();
         while (index < expression.length() && Character.isLetter(expression.charAt(index))) {
-            functionName.append(expression.charAt(index));
+            functionName.append(functionName.length() == 0 ? Character.toLowerCase(expression.charAt(index)) : expression.charAt(index));
             index++;
         }
 
@@ -222,25 +222,11 @@ public class ExpressionParser {
                 index++;
             }
 
-            switch (functionName.toString()) {
-                case "sin":
-                    return new Operand(Double.parseDouble(TrigonometricFunction.handleSin(argument.getAsBigDecimal())));
-                case "cos":
-                    return new Operand(Double.parseDouble(TrigonometricFunction.handleCos(argument.getAsBigDecimal())));
-                case "tan":
-                    return new Operand(Double.parseDouble(TrigonometricFunction.handleTan(argument.getAsBigDecimal())));
-                case "asin":
-                    return new Operand(Double.parseDouble(TrigonometricFunction.handleAsin(argument.getAsBigDecimal())));
-                case "acos":
-                    return new Operand(Double.parseDouble(TrigonometricFunction.handleAcos(argument.getAsBigDecimal())));
-                case "atan":
-                    return new Operand(Double.parseDouble(TrigonometricFunction.handleAtan(argument.toString())));
-                case "log":
-                    return new Operand(Double.parseDouble(LogarithmicFunction.handleLog(argument.getAsBigDecimal())));
-                case "ln":
-                    return new Operand(Double.parseDouble(LogarithmicFunction.handleLn(argument.getAsBigDecimal())));
-                default:
-                    throw new IllegalArgumentException("Invalid expression");
+            Function func = OperationRegistry.getFunction(functionName.toString().toLowerCase());
+            if (func != null) {
+                return func.apply(argument);
+            } else {
+                throw new IllegalArgumentException("Invalid expression");
             }
         } else {
             throw new IllegalArgumentException("Invalid expression");
