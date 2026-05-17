@@ -11,18 +11,35 @@ public class Operand {
     private final Double doubleValue;
     private final boolean isSpecial; // For Infinity, NaN
 
+    /**
+     * Constructs an {@code Operand} with a {@link BigDecimal} value.
+     *
+     * @param value the BigDecimal value
+     */
     public Operand(BigDecimal value) {
         this.bigDecimalValue = value;
         this.doubleValue = null;
         this.isSpecial = false;
     }
 
+    /**
+     * Constructs an {@code Operand} with a {@code double} value.
+     *
+     * @param value the double value
+     */
     public Operand(double value) {
         this.bigDecimalValue = null;
         this.doubleValue = value;
         this.isSpecial = Double.isInfinite(value) || Double.isNaN(value);
     }
 
+    /**
+     * Creates an {@code Operand} from a string representation.
+     *
+     * @param value the string representation of the value
+     * @return a new {@code Operand}
+     * @throws NumberFormatException if the value is not a valid number
+     */
     public static Operand of(String value) {
         try {
             if (value.equals("Infinity") || value.equals("∞")) {
@@ -47,6 +64,11 @@ public class Operand {
         }
     }
 
+    /**
+     * Returns the value as a {@link BigDecimal}.
+     *
+     * @return the BigDecimal value
+     */
     public BigDecimal getAsBigDecimal() {
         if (bigDecimalValue != null) return bigDecimalValue;
         if (doubleValue.isInfinite()) {
@@ -58,15 +80,30 @@ public class Operand {
         return BigDecimal.valueOf(doubleValue);
     }
 
+    /**
+     * Returns the value as a {@code double}.
+     *
+     * @return the double value
+     */
     public double getAsDouble() {
         if (doubleValue != null) return doubleValue;
         return bigDecimalValue.doubleValue();
     }
 
+    /**
+     * Checks if this operand wraps a {@link BigDecimal}.
+     *
+     * @return {@code true} if the value is a {@link BigDecimal}, {@code false} otherwise
+     */
     public boolean isBigDecimal() {
         return bigDecimalValue != null;
     }
 
+    /**
+     * Checks if this operand represents a special value (Infinity or NaN).
+     *
+     * @return {@code true} if it's special, {@code false} otherwise
+     */
     public boolean isSpecial() {
         return isSpecial;
     }

@@ -11,13 +11,20 @@ public class Lexer {
     private final String input;
     private int index = 0;
 
+    /**
+     * Constructs a {@code Lexer} for the given input expression.
+     *
+     * @param input the mathematical expression to tokenize
+     */
     public Lexer(String input) {
         this.input = input;
     }
 
     /**
-     * Tokenizes the input string.
-     * @return A list of tokens.
+     * Tokenizes the input string into a list of tokens.
+     *
+     * @return a list of {@link Token} objects
+     * @throws SyntaxException if an invalid character is encountered
      */
     public List<Token> tokenize() {
         List<Token> tokens = new ArrayList<>();

@@ -60,6 +60,12 @@ public class CalculationEngine {
 
     /**
      * Performs a binary arithmetic operation.
+     *
+     * @param left the left operand
+     * @param right the right operand
+     * @param operator the operator character (e.g., '+', '-', '*', '/', '^')
+     * @return the result of the calculation as an {@link Operand}
+     * @throws SyntaxException if the operator is invalid
      */
     public static Operand calculate(Operand left, Operand right, char operator) {
         BinaryOperator op = operators.get(operator);
@@ -71,6 +77,11 @@ public class CalculationEngine {
 
     /**
      * Performs a power operation.
+     *
+     * @param base the base operand
+     * @param exponent the exponent operand
+     * @return the result of base raised to the power of exponent
+     * @throws DomainException if both base and exponent are zero (undefined)
      */
     public static Operand power(Operand base, Operand exponent) {
         if (base.isBigDecimal() && exponent.isBigDecimal()) {
@@ -104,6 +115,10 @@ public class CalculationEngine {
 
     /**
      * Calculates the square root of an operand.
+     *
+     * @param operand the operand to calculate the square root of
+     * @return the square root of the operand
+     * @throws DomainException if the operand is negative
      */
     public static Operand sqrt(Operand operand) {
         double val = operand.getAsDouble();
@@ -115,6 +130,9 @@ public class CalculationEngine {
 
     /**
      * Calculates the cube root of an operand.
+     *
+     * @param operand the operand to calculate the cube root of
+     * @return the cube root of the operand
      */
     public static Operand cbrt(Operand operand) {
         return new Operand(Math.cbrt(operand.getAsDouble()));

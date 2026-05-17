@@ -2,6 +2,7 @@ build/
 .gradle/
 .idea/
 gitignored/
+.fresh/
 *.class
 *.log
 bin/
