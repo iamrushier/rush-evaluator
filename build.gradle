@@ -1,12 +1,10 @@
 plugins {
     id 'java-library'
-    id 'maven-publish'
-    id 'signing'
+    id 'com.vanniktech.maven.publish' version '0.32.0'
 }
 
 group = 'io.github.iamrushier'
-version = '1.0.1' // Incremented for new changes
-
+version = '1.0.1'
 sourceCompatibility = '1.8'
 targetCompatibility = '1.8'
 
@@ -27,66 +25,50 @@ test {
     useJUnitPlatform()
 }
 
-java {
-    withJavadocJar()
-    withSourcesJar()
-}
+mavenPublishing {
+    publishToMavenCentral(com.vanniktech.maven.publish.SonatypeHost.CENTRAL_PORTAL)
+    signAllPublications()
 
-publishing {
-    publications {
-        mavenJava(MavenPublication) {
-            from components.java
+    coordinates('io.github.iamrushier', 'rush-evaluator', '1.0.1')
 
-            pom {
-                name = 'RushEvaluator'
-                description = 'A powerful and high-precision mathematical expression evaluator for Java.'
-                url = 'https://github.com/iamrushier/rush-evaluator'
-                licenses {
-                    license {
-                        name = 'The Apache License, Version 2.0'
-                        url = 'http://www.apache.org/licenses/LICENSE-2.0.txt'
-                    }
-                }
-                developers {
-                    developer {
-                        id = 'iamrushier'
-                        name = 'Rushikesh Surve'
-                        email = '134696856+iamrushier@users.noreply.github.com'
-                    }
-                }
-                scm {
-                    connection = 'scm:git:git://github.com/iamrushier/rush-evaluator.git'
-                    developerConnection = 'scm:git:ssh://github.com/iamrushier/rush-evaluator.git'
-                    url = 'https://github.com/iamrushier/rush-evaluator'
-                }
+    pom {
+        name = 'RushEvaluator'
+        description = 'A powerful and high-precision mathematical expression evaluator for Java.'
+        url = 'https://github.com/iamrushier/rush-evaluator'
+
+        licenses {
+            license {
+                name = 'The Apache License, Version 2.0'
+                url = 'https://www.apache.org/licenses/LICENSE-2.0.txt'
             }
         }
+
+        developers {
+            developer {
+                id = 'iamrushier'
+                name = 'Rushikesh Surve'
+                email = '134696856+iamrushier@users.noreply.github.com'
+            }
+        }
+
+        scm {
+            url = 'https://github.com/iamrushier/rush-evaluator'
+            connection = 'scm:git:git://github.com/iamrushier/rush-evaluator.git'
+            developerConnection = 'scm:git:ssh://git@github.com/iamrushier/rush-evaluator.git'
+        }
     }
+}
+
+// GitHub Packages publishing target
+publishing {
     repositories {
         maven {
-            name = "GitHubPackages"
-            url = uri("https://maven.pkg.github.com/iamrushier/rush-evaluator")
+            name = 'GitHubPackages'
+            url = uri('https://maven.pkg.github.com/iamrushier/rush-evaluator')
             credentials {
-                username = System.getenv("GITHUB_ACTOR")
-                password = System.getenv("GITHUB_TOKEN")
+                username = System.getenv('GITHUB_ACTOR')
+                password = System.getenv('GITHUB_TOKEN')
             }
         }
-        maven {
-            name = "OSSRH"
-            url = uri("https://s01.oss.sonatype.org/service/local/staging/deploy/maven2/")
-            credentials {
-                username = System.getenv("MAVEN_USERNAME")
-                password = System.getenv("MAVEN_PASSWORD")
-            }
-        }
-    }
-}
-
-signing {
-    def signingKey = System.getenv("GPG_SIGNING_KEY")
-    def signingPassword = System.getenv("GPG_PASSPHRASE")
-    if (signingKey != null && signingPassword != null) {
-        useInMemoryPgpKeys(signingKey, signingPassword)
-        sign publishing.publications.mavenJava
     }
 }
