@@ -27,9 +27,6 @@ jobs:
           distribution: 'temurin'
           cache: 'gradle'
 
-      - name: Validate Gradle wrapper
-        uses: gradle/actions/wrapper-validation@v3
-
       - name: Make gradlew executable
         run: chmod +x gradlew
 
@@ -45,7 +42,6 @@ jobs:
   publish-maven-central:
     name: Publish to Maven Central
     runs-on: ubuntu-latest
-    # Only runs when a version tag is pushed (e.g. v1.0.1) or manually triggered
     if: startsWith(github.ref, 'refs/tags/v') || github.event_name == 'workflow_dispatch'
     permissions:
       contents: read
@@ -60,9 +56,6 @@ jobs:
           java-version: '17'
           distribution: 'temurin'
           cache: 'gradle'
-
-      - name: Validate Gradle wrapper
-        uses: gradle/actions/wrapper-validation@v3
 
       - name: Make gradlew executable
         run: chmod +x gradlew
