@@ -1,18 +1,21 @@
-name: Publish package
+name: Publish Package
 
 on:
   push:
     branches:
       - master
-  workflow_dispatch: # Allows manual trigger from Actions tab
+    tags:
+      - 'v*'
+  workflow_dispatch:
 
 jobs:
-  publish-github:
+  publish-github-packages:
     name: Publish to GitHub Packages
     runs-on: ubuntu-latest
     permissions:
       contents: read
       packages: write
+
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -30,19 +33,23 @@ jobs:
       - name: Make gradlew executable
         run: chmod +x gradlew
 
-      - name: Build and Test
+      - name: Build and test
         run: ./gradlew build
 
       - name: Publish to GitHub Packages
-        run: ./gradlew publish
+        run: ./gradlew publishAllPublicationsToGitHubPackagesRepository
         env:
+          GITHUB_ACTOR: ${{ github.actor }}
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-  publish-maven:
+  publish-maven-central:
     name: Publish to Maven Central
-    # Only run if MAVEN_USERNAME is set (implies secrets are configured)
-    if: "${{ github.event_name == 'workflow_dispatch' || startsWith(github.ref, 'refs/tags/v') }}"
     runs-on: ubuntu-latest
+    # Only runs when a version tag is pushed (e.g. v1.0.1) or manually triggered
+    if: startsWith(github.ref, 'refs/tags/v') || github.event_name == 'workflow_dispatch'
+    permissions:
+      contents: read
+
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -54,13 +61,16 @@ jobs:
           distribution: 'temurin'
           cache: 'gradle'
 
+      - name: Validate Gradle wrapper
+        uses: gradle/actions/wrapper-validation@v3
+
       - name: Make gradlew executable
         run: chmod +x gradlew
 
-      - name: Publish to Maven Central (OSSRH)
-        run: ./gradlew publishAllPublicationsToOSSRHRepository
+      - name: Publish to Maven Central
+        run: ./gradlew publishAllPublicationsToMavenCentralRepository --no-configuration-cache
         env:
-          MAVEN_USERNAME: ${{ secrets.MAVEN_USERNAME }}
-          MAVEN_PASSWORD: ${{ secrets.MAVEN_PASSWORD }}
-          GPG_SIGNING_KEY: ${{ secrets.GPG_SIGNING_KEY }}
-          GPG_PASSPHRASE: ${{ secrets.GPG_PASSPHRASE }}
+          ORG_GRADLE_PROJECT_mavenCentralUsername: ${{ secrets.MAVEN_USERNAME }}
+          ORG_GRADLE_PROJECT_mavenCentralPassword: ${{ secrets.MAVEN_PASSWORD }}
+          ORG_GRADLE_PROJECT_signingInMemoryKey: ${{ secrets.GPG_SIGNING_KEY }}
+          ORG_GRADLE_PROJECT_signingInMemoryKeyPassword: ${{ secrets.GPG_PASSPHRASE }}
