@@ -93,4 +93,22 @@ public class CalculationEngine {
         }
         return new Operand(Math.pow(b, e));
     }
+
+    /**
+     * Calculates the square root of an operand.
+     */
+    public static Operand sqrt(Operand operand) {
+        double val = operand.getAsDouble();
+        if (val < 0) {
+            throw new ArithmeticException("Domain error");
+        }
+        return new Operand(Math.sqrt(val));
+    }
+
+    /**
+     * Calculates the cube root of an operand.
+     */
+    public static Operand cbrt(Operand operand) {
+        return new Operand(Math.cbrt(operand.getAsDouble()));
+    }
 }

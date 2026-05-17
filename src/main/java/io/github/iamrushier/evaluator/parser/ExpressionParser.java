@@ -136,6 +136,12 @@ public class ExpressionParser {
             if (isIndexValidAndCharIs(index, expression, ')')) {
                 index++;
             }
+        } else if (isIndexValidAndCharIs(index, expression, '\u221a')) { // √
+            index++;
+            result = CalculationEngine.sqrt(parseFactor(expression));
+        } else if (isIndexValidAndCharIs(index, expression, '\u221b')) { // ∛
+            index++;
+            result = CalculationEngine.cbrt(parseFactor(expression));
         } else if (isIndexValidAndCharIs(index, expression, '\u03c0')) {
             index++;
             result = new Operand(Constants.PI);
