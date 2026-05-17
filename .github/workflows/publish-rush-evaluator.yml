@@ -12,10 +12,11 @@ jobs:
   publish-github-packages:
     name: Publish to GitHub Packages
     runs-on: ubuntu-latest
+    if: github.ref_type == 'branch' || github.event_name == 'workflow_dispatch'
     permissions:
       contents: read
       packages: write
-    if: github.ref_type == 'branch' || github.event_name == 'workflow_dispatch'
+
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
