@@ -4,7 +4,7 @@ plugins {
 }
 
 group = 'io.github.iamrushier'
-version = '2.0.4'   // ← Update this before each release
+version = '2.0.5'   // ← Update this before releasing
 
 sourceCompatibility = '1.8'
 targetCompatibility = '1.8'
@@ -26,9 +26,9 @@ test {
     useJUnitPlatform()
 }
 
-// Maven Central + Signing
+// ==================== Maven Publishing ====================
 mavenPublishing {
-    mavenCentralPublishing = true     // Recommended way in 0.36.0
+    publishToMavenCentral()      // ← This is the correct method
     signAllPublications()
 
     coordinates('io.github.iamrushier', 'rush-evaluator', version)
@@ -61,7 +61,7 @@ mavenPublishing {
     }
 }
 
-// GitHub Packages
+// ==================== GitHub Packages ====================
 publishing {
     repositories {
         maven {
