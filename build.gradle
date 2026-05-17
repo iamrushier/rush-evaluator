@@ -5,9 +5,10 @@ plugins {
 }
 
 group = 'io.github.iamrushier'
-version = '1.0.0'
+version = '1.0.1' // Incremented for new changes
 
 sourceCompatibility = '1.8'
+targetCompatibility = '1.8'
 
 tasks.withType(JavaCompile) {
     options.encoding = 'UTF-8'
@@ -38,7 +39,7 @@ publishing {
 
             pom {
                 name = 'RushEvaluator'
-                description = 'A powerful and flexible mathematical expression evaluator for Java.'
+                description = 'A powerful and high-precision mathematical expression evaluator for Java.'
                 url = 'https://github.com/iamrushier/rush-evaluator'
                 licenses {
                     license {
@@ -50,7 +51,7 @@ publishing {
                     developer {
                         id = 'iamrushier'
                         name = 'Rushikesh Surve'
-                        email = '101.rushikesh.mail@gmail.com'
+                        email = '134696856+iamrushier@users.noreply.github.com'
                     }
                 }
                 scm {
@@ -70,5 +71,22 @@ publishing {
                 password = System.getenv("GITHUB_TOKEN")
             }
         }
+        maven {
+            name = "OSSRH"
+            url = uri("https://s01.oss.sonatype.org/service/local/staging/deploy/maven2/")
+            credentials {
+                username = System.getenv("MAVEN_USERNAME")
+                password = System.getenv("MAVEN_PASSWORD")
+            }
+        }
+    }
+}
+
+signing {
+    def signingKey = System.getenv("GPG_SIGNING_KEY")
+    def signingPassword = System.getenv("GPG_PASSPHRASE")
+    if (signingKey != null && signingPassword != null) {
+        useInMemoryPgpKeys(signingKey, signingPassword)
+        sign publishing.publications.mavenJava
     }
 }
