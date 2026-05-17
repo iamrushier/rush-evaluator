@@ -63,7 +63,7 @@ jobs:
         run: chmod +x gradlew
 
       - name: Publish to Maven Central
-        run: ./gradlew publishAllPublicationsToMavenCentralRepository --no-configuration-cache --info
+        run: ./gradlew publishAndReleaseToMavenCentral --no-configuration-cache --info
         env:
           MAVEN_CENTRAL_USERNAME: ${{ secrets.MAVEN_USERNAME }}
           MAVEN_CENTRAL_PASSWORD: ${{ secrets.MAVEN_PASSWORD }}
