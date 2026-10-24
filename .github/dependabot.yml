@@ -5,9 +5,23 @@ updates:
     schedule:
       interval: "weekly"
     open-pull-requests-limit: 10
+    groups:
+      junit:
+        patterns:
+          - "org.junit.jupiter:*"
+      plugins:
+        patterns:
+          - "com.vanniktech.*"
+    ignore:
+      - dependency-name: "gradle-wrapper"
+        update-types: ["version-update:semver-major"]
 
   - package-ecosystem: "github-actions"
     directory: "/"
     schedule:
       interval: "weekly"
     open-pull-requests-limit: 10
+    groups:
+      actions:
+        patterns:
+          - "*"
