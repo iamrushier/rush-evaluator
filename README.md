@@ -1,6 +1,7 @@
 # RushEvaluator
 
 [![Maven Central](https://img.shields.io/maven-central/v/io.github.iamrushier/rush-evaluator.svg?label=Maven%20Central)](https://central.sonatype.com/artifact/io.github.iamrushier/rush-evaluator)
+[![CI](https://github.com/iamrushier/rush-evaluator/actions/workflows/ci.yml/badge.svg)](https://github.com/iamrushier/rush-evaluator/actions/workflows/ci.yml)
 [![License](https://img.shields.io/badge/License-Apache_2.0-blue.svg)](LICENSE)
 [![Java Version](https://img.shields.io/badge/Java-8%2B-orange.svg)]()
 [![GitHub Release](https://img.shields.io/github/v/release/iamrushier/rush-evaluator)](https://github.com/iamrushier/rush-evaluator/releases)
