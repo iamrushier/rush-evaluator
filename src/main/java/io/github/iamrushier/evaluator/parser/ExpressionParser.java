@@ -1,5 +1,6 @@
 package io.github.iamrushier.evaluator.parser;
 
+import io.github.iamrushier.evaluator.config.EvaluationConfig;
 import io.github.iamrushier.evaluator.exception.SyntaxException;
 import io.github.iamrushier.evaluator.function.Function;
 import io.github.iamrushier.evaluator.util.CalculationEngine;
@@ -15,8 +16,38 @@ import java.util.List;
  * It uses a recursive descent parser working on a stream of tokens from the Lexer.
  */
 public class ExpressionParser {
+    private final EvaluationConfig config;
     private List<Token> tokens;
     private int pos;
+
+    /**
+     * Constructs an {@code ExpressionParser} with the default configuration.
+     */
+    public ExpressionParser() {
+        this(EvaluationConfig.defaultConfig());
+    }
+
+    /**
+     * Constructs an {@code ExpressionParser} with a custom {@link EvaluationConfig}.
+     *
+     * @param config the configuration to use for parsing and evaluation
+     */
+    public ExpressionParser(EvaluationConfig config) {
+        this.config = config != null ? config : EvaluationConfig.defaultConfig();
+    }
+
+    /**
+     * Parses and evaluates the given mathematical expression string into an {@link Operand}.
+     *
+     * @param expression The mathematical expression string to parse.
+     * @return The result of the parsed expression as an {@link Operand}.
+     */
+    public Operand parseToOperand(String expression) {
+        Lexer lexer = new Lexer(expression);
+        this.tokens = lexer.tokenize();
+        this.pos = 0;
+        return parseExpression();
+    }
 
     /**
      * Parses and evaluates the given mathematical expression.
@@ -26,10 +57,7 @@ public class ExpressionParser {
      * @return The result of the parsed expression as a String.
      */
     public String parse(String expression) {
-        Lexer lexer = new Lexer(expression);
-        this.tokens = lexer.tokenize();
-        this.pos = 0;
-        return parseExpression().toString();
+        return parseToOperand(expression).toString();
     }
 
     private Token peek() {
@@ -185,7 +213,7 @@ public class ExpressionParser {
             
             Function func = OperationRegistry.getFunction(functionName.toLowerCase());
             if (func != null) {
-                return func.apply(argument);
+                return func.apply(argument, config);
             } else {
                 throw new SyntaxException("Unknown function: " + functionName);
             }

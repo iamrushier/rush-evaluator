@@ -1,10 +1,11 @@
 package io.github.iamrushier.evaluator.util;
 
+import io.github.iamrushier.evaluator.config.AngleMode;
+import io.github.iamrushier.evaluator.config.EvaluationConfig;
 import io.github.iamrushier.evaluator.function.Function;
 import io.github.iamrushier.evaluator.function.LogarithmicFunction;
 import io.github.iamrushier.evaluator.function.TrigonometricFunction;
 
-import java.math.BigDecimal;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -15,17 +16,47 @@ public class OperationRegistry {
     private static final Map<String, Function> functions = new HashMap<>();
 
     static {
-        functions.put("sin", arg -> new Operand(Double.parseDouble(TrigonometricFunction.handleSin(arg.getAsBigDecimal()))));
-        functions.put("cos", arg -> new Operand(Double.parseDouble(TrigonometricFunction.handleCos(arg.getAsBigDecimal()))));
-        functions.put("tan", arg -> new Operand(Double.parseDouble(TrigonometricFunction.handleTan(arg.getAsBigDecimal()))));
-        functions.put("asin", arg -> new Operand(Double.parseDouble(TrigonometricFunction.handleAsin(arg.getAsBigDecimal()))));
-        functions.put("acos", arg -> new Operand(Double.parseDouble(TrigonometricFunction.handleAcos(arg.getAsBigDecimal()))));
-        functions.put("atan", arg -> new Operand(Double.parseDouble(TrigonometricFunction.handleAtan(arg.toString()))));
-        functions.put("log", arg -> new Operand(Double.parseDouble(LogarithmicFunction.handleLog(arg.getAsBigDecimal()))));
-        functions.put("ln", arg -> new Operand(Double.parseDouble(LogarithmicFunction.handleLn(arg.getAsBigDecimal()))));
+        registerFunction("sin", (arg, config) ->
+            new Operand(Double.parseDouble(TrigonometricFunction.handleSin(arg.getAsBigDecimal(), getMode(config)))));
+        registerFunction("cos", (arg, config) ->
+            new Operand(Double.parseDouble(TrigonometricFunction.handleCos(arg.getAsBigDecimal(), getMode(config)))));
+        registerFunction("tan", (arg, config) ->
+            new Operand(Double.parseDouble(TrigonometricFunction.handleTan(arg.getAsBigDecimal(), getMode(config)))));
+        registerFunction("asin", (arg, config) ->
+            new Operand(Double.parseDouble(TrigonometricFunction.handleAsin(arg.getAsBigDecimal(), getMode(config)))));
+        registerFunction("acos", (arg, config) ->
+            new Operand(Double.parseDouble(TrigonometricFunction.handleAcos(arg.getAsBigDecimal(), getMode(config)))));
+        registerFunction("atan", (arg, config) ->
+            new Operand(Double.parseDouble(TrigonometricFunction.handleAtan(arg.toString(), getMode(config)))));
+        registerFunction("log", (arg, config) ->
+            new Operand(Double.parseDouble(LogarithmicFunction.handleLog(arg.getAsBigDecimal()))));
+        registerFunction("ln", (arg, config) ->
+            new Operand(Double.parseDouble(LogarithmicFunction.handleLn(arg.getAsBigDecimal()))));
+    }
+
+    private static AngleMode getMode(EvaluationConfig config) {
+        return config != null ? config.getAngleMode() : AngleMode.DEGREES;
+    }
+
+    private static void registerFunction(String name, ConfigurableFunction func) {
+        functions.put(name, func);
     }
 
     private OperationRegistry() {}
+
+    /**
+     * Functional interface for functions supporting evaluation configuration.
+     */
+    @FunctionalInterface
+    public interface ConfigurableFunction extends Function {
+        @Override
+        default Operand apply(Operand argument) {
+            return apply(argument, EvaluationConfig.defaultConfig());
+        }
+
+        @Override
+        Operand apply(Operand argument, EvaluationConfig config);
+    }
 
     /**
      * Retrieves a function by name.

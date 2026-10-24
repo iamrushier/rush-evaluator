@@ -43,7 +43,7 @@ implementation("io.github.iamrushier:rush-evaluator:2.0.6")
   - Exponents and Roots: Exponentiation (`^`), Square Root (`√`), and Cube Root (`∛`)
   - Unary support: Leading signs (e.g., `-5`, `+π`) and parenthesized negatives `(-3)`
 - **📈 Mathematical Functions:**
-  - Trigonometric: `sin`, `cos`, `tan`, `asin`, `acos`, `atan` (calculated in degrees)
+  - Trigonometric: `sin`, `cos`, `tan`, `asin`, `acos`, `atan` (configurable: Degrees or Radians)
   - Logarithmic: `log` (base 10) and `ln` (natural logarithm)
 - **🔢 Constants:** High-precision constants for `π` (Pi), `e` (Euler's number), and `∞` (Infinity).
 - **🤝 Smart Syntax & Preprocessing:**
@@ -57,6 +57,8 @@ implementation("io.github.iamrushier:rush-evaluator:2.0.6")
 
 ```java
 import io.github.iamrushier.evaluator.RushEvaluator;
+import io.github.iamrushier.evaluator.config.AngleMode;
+import java.math.BigDecimal;
 
 public class Main {
     public static void main(String[] args) {
@@ -66,8 +68,14 @@ public class Main {
         // Powers and nested roots
         String res2 = RushEvaluator.evaluate("√√16 + 2^3"); // "10"
 
-        // Trigonometric function (degrees) and constants
-        String res3 = RushEvaluator.evaluate("sin(30) + 2π"); // "6.7831853071..."
+        // Trigonometry: Degrees (default) and Radians
+        String deg = RushEvaluator.evaluate("sin(30)"); // "0.5"
+        String rad = RushEvaluator.evaluate("sin(π / 6)", AngleMode.RADIANS); // "0.5"
+        String cosRad = RushEvaluator.evaluate("cos(π)", AngleMode.RADIANS); // "-1"
+
+        // Direct numeric output (no string re-parsing needed)
+        BigDecimal val = RushEvaluator.evaluateToBigDecimal("10 / 4 + 2.5"); // 5.0
+        double dVal = RushEvaluator.evaluateToDouble("2^10"); // 1024.0
 
         // Implicit multiplication and percentage
         String res4 = RushEvaluator.evaluate("50% * 200 + 2(3 + 4)"); // "114"
@@ -75,8 +83,8 @@ public class Main {
 }
 ```
 
-> [!NOTE]
-> **Trigonometric Angle Mode:** Trigonometric functions (`sin`, `cos`, `tan`, etc.) currently evaluate angles in **Degrees** (e.g., `sin(30)` = `0.5`). Support for configurable angle modes (Radians / Degrees) is planned for an upcoming release.
+> [!TIP]
+> **Angle Modes:** Trigonometric functions default to **Degrees** for calculator convenience, but you can pass `AngleMode.RADIANS` to evaluate standard scientific radian expressions like `sin(π)`.
 
 ---
 
@@ -132,10 +140,11 @@ cd rush-evaluator
 ## 🗺️ Roadmap & Standardization
 
 This library is undergoing continuous improvement to make it more standardized and developer-friendly:
-- [ ] Configurable **AngleMode** (Degrees vs. Radians).
-- [ ] Direct numeric return type overloads (`evaluateToBigDecimal(String)`).
-- [ ] Support for variables and custom function definitions.
-- [ ] Multi-platform CI matrix testing on Java 8, 11, 17, and 21.
+- [x] Configurable **AngleMode** (Degrees vs. Radians).
+- [x] Direct numeric return type overloads (`evaluateToBigDecimal(String)` and `evaluateToDouble(String)`).
+- [x] Multi-platform CI matrix testing on Java 17 and 21 across Ubuntu and Windows.
+- [ ] Variables and custom function definitions.
+- [ ] Automated Javadoc hosting.
 
 ---
 

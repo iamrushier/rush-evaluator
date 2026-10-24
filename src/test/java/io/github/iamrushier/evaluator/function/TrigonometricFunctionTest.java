@@ -1,5 +1,6 @@
 package io.github.iamrushier.evaluator.function;
 
+import io.github.iamrushier.evaluator.config.AngleMode;
 import io.github.iamrushier.evaluator.exception.DomainException;
 import org.junit.jupiter.api.Test;
 import java.math.BigDecimal;
@@ -34,6 +35,14 @@ class TrigonometricFunctionTest {
     }
 
     @Test
+    void handleSin_radiansMode_returnsCorrectResult() {
+        assertEquals("0", TrigonometricFunction.handleSin(BigDecimal.ZERO, AngleMode.RADIANS));
+        assertEquals("1", TrigonometricFunction.handleSin(BigDecimal.valueOf(Math.PI / 2), AngleMode.RADIANS));
+        assertEquals("0", TrigonometricFunction.handleSin(BigDecimal.valueOf(Math.PI), AngleMode.RADIANS));
+        assertEquals("-1", TrigonometricFunction.handleSin(BigDecimal.valueOf(3 * Math.PI / 2), AngleMode.RADIANS));
+    }
+
+    @Test
     void handleCos_specialAngles_returnsCorrectResult() {
         assertEquals("1", TrigonometricFunction.handleCos(BigDecimal.ZERO));
         assertEquals("0.5", TrigonometricFunction.handleCos(new BigDecimal("60")));
@@ -59,6 +68,13 @@ class TrigonometricFunctionTest {
     }
 
     @Test
+    void handleCos_radiansMode_returnsCorrectResult() {
+        assertEquals("1", TrigonometricFunction.handleCos(BigDecimal.ZERO, AngleMode.RADIANS));
+        assertEquals("0", TrigonometricFunction.handleCos(BigDecimal.valueOf(Math.PI / 2), AngleMode.RADIANS));
+        assertEquals("-1", TrigonometricFunction.handleCos(BigDecimal.valueOf(Math.PI), AngleMode.RADIANS));
+    }
+
+    @Test
     void handleTan_specialAngles_returnsCorrectResult() {
         assertEquals("0", TrigonometricFunction.handleTan(BigDecimal.ZERO));
         assertEquals("1", TrigonometricFunction.handleTan(new BigDecimal("45")));
@@ -71,64 +87,53 @@ class TrigonometricFunctionTest {
     }
 
     @Test
-    void handleTan_normalizedAngles_returnsCorrectResult() {
-        assertEquals("0", TrigonometricFunction.handleTan(new BigDecimal("360")));
-        assertEquals("Infinity", TrigonometricFunction.handleTan(new BigDecimal("450")));
-        assertEquals("Infinity", TrigonometricFunction.handleTan(new BigDecimal("-90")));
-    }
-
-    @Test
-    void handleTan_generalAngles_returnsCorrectResult() {
-        BigDecimal angle = new BigDecimal("30");
-        assertEquals("0.5773502692", TrigonometricFunction.handleTan(angle));
+    void handleTan_radiansMode_returnsCorrectResult() {
+        assertEquals("0", TrigonometricFunction.handleTan(BigDecimal.ZERO, AngleMode.RADIANS));
+        assertEquals("1", TrigonometricFunction.handleTan(BigDecimal.valueOf(Math.PI / 4), AngleMode.RADIANS));
     }
 
     @Test
     void handleAsin_specialValues_returnsCorrectResult() {
+        assertEquals("0", TrigonometricFunction.handleAsin(BigDecimal.ZERO));
         assertEquals("30", TrigonometricFunction.handleAsin(new BigDecimal("0.5")));
         assertEquals("90", TrigonometricFunction.handleAsin(BigDecimal.ONE));
         assertEquals("-30", TrigonometricFunction.handleAsin(new BigDecimal("-0.5")));
-        assertEquals("-90", TrigonometricFunction.handleAsin(BigDecimal.valueOf(-1)));
+        assertEquals("-90", TrigonometricFunction.handleAsin(new BigDecimal("-1")));
     }
 
     @Test
-    void handleAsin_outOfDomain_throwsDomainException() {
-        assertThrows(DomainException.class, () -> {
-            TrigonometricFunction.handleAsin(new BigDecimal("1.1"));
-        });
-        assertThrows(DomainException.class, () -> {
-            TrigonometricFunction.handleAsin(new BigDecimal("-1.1"));
-        });
+    void handleAsin_radiansMode_returnsCorrectResult() {
+        assertEquals("0", TrigonometricFunction.handleAsin(BigDecimal.ZERO, AngleMode.RADIANS));
+        assertEquals("1.5707963268", TrigonometricFunction.handleAsin(BigDecimal.ONE, AngleMode.RADIANS));
     }
 
     @Test
-    void handleAsin_generalValues_returnsCorrectResult() {
-        BigDecimal value = new BigDecimal("0.70710678118");
-        assertEquals("44.9999999995", TrigonometricFunction.handleAsin(value));
+    void handleAsin_outOfRange_throwsDomainException() {
+        assertThrows(DomainException.class, () -> TrigonometricFunction.handleAsin(new BigDecimal("1.1")));
+        assertThrows(DomainException.class, () -> TrigonometricFunction.handleAsin(new BigDecimal("-1.1")));
+        assertThrows(DomainException.class, () -> TrigonometricFunction.handleAsin(new BigDecimal("1.1"), AngleMode.RADIANS));
     }
 
     @Test
     void handleAcos_specialValues_returnsCorrectResult() {
+        assertEquals("90", TrigonometricFunction.handleAcos(BigDecimal.ZERO));
         assertEquals("60", TrigonometricFunction.handleAcos(new BigDecimal("0.5")));
         assertEquals("0", TrigonometricFunction.handleAcos(BigDecimal.ONE));
         assertEquals("120", TrigonometricFunction.handleAcos(new BigDecimal("-0.5")));
-        assertEquals("180", TrigonometricFunction.handleAcos(BigDecimal.valueOf(-1)));
+        assertEquals("180", TrigonometricFunction.handleAcos(new BigDecimal("-1")));
     }
 
     @Test
-    void handleAcos_outOfDomain_throwsDomainException() {
-        assertThrows(DomainException.class, () -> {
-            TrigonometricFunction.handleAcos(new BigDecimal("1.1"));
-        });
-        assertThrows(DomainException.class, () -> {
-            TrigonometricFunction.handleAcos(new BigDecimal("-1.1"));
-        });
+    void handleAcos_radiansMode_returnsCorrectResult() {
+        assertEquals("0", TrigonometricFunction.handleAcos(BigDecimal.ONE, AngleMode.RADIANS));
+        assertEquals("1.5707963268", TrigonometricFunction.handleAcos(BigDecimal.ZERO, AngleMode.RADIANS));
     }
 
     @Test
-    void handleAcos_generalValues_returnsCorrectResult() {
-        BigDecimal value = new BigDecimal("0.7071067811865476");
-        assertEquals("45", TrigonometricFunction.handleAcos(value));
+    void handleAcos_outOfRange_throwsDomainException() {
+        assertThrows(DomainException.class, () -> TrigonometricFunction.handleAcos(new BigDecimal("1.1")));
+        assertThrows(DomainException.class, () -> TrigonometricFunction.handleAcos(new BigDecimal("-1.1")));
+        assertThrows(DomainException.class, () -> TrigonometricFunction.handleAcos(new BigDecimal("1.1"), AngleMode.RADIANS));
     }
 
     @Test
@@ -138,6 +143,14 @@ class TrigonometricFunctionTest {
         assertEquals("45", TrigonometricFunction.handleAtan("1"));
         assertEquals("-45", TrigonometricFunction.handleAtan("-1"));
         assertEquals("0", TrigonometricFunction.handleAtan("0"));
+    }
+
+    @Test
+    void handleAtan_radiansMode_returnsCorrectResult() {
+        assertEquals("0", TrigonometricFunction.handleAtan("0", AngleMode.RADIANS));
+        assertEquals("0.7853981634", TrigonometricFunction.handleAtan("1", AngleMode.RADIANS));
+        assertEquals("1.5707963268", TrigonometricFunction.handleAtan("Infinity", AngleMode.RADIANS));
+        assertEquals("-1.5707963268", TrigonometricFunction.handleAtan("-Infinity", AngleMode.RADIANS));
     }
 
     @Test
