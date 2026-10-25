@@ -20,6 +20,8 @@ public enum TokenType {
     PAREN_OPEN,
     /** A closing parenthesis ')'. */
     PAREN_CLOSE,
+    /** A comma separator ',' for multi-argument functions. */
+    COMMA,
     /** End of file/expression. */
     EOF
 }

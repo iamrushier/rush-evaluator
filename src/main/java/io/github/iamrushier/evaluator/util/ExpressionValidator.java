@@ -20,7 +20,7 @@ public class ExpressionValidator {
      *     <li>Replaces '÷' with '/'.</li>
      *     <li>Replaces '%' with '(1/100)'.</li>
      *     <li>Inserts '*' if a closing parenthesis is followed by an opening parenthesis, number, constant, function, or variable.</li>
-     *     <li>Inserts '*' if a number is followed by anything except a closing parenthesis, digit, decimal point, or operator (+, -, *, /, ^).</li>
+     *     <li>Inserts '*' if a number is followed by anything except a closing parenthesis, digit, decimal point, comma, or operator (+, -, *, /, ^).</li>
      *     <li>Inserts '*' if a constant (π, ∞, standalone e) is followed by an opening parenthesis or another operand.</li>
      * </ul>
      *
@@ -32,14 +32,14 @@ public class ExpressionValidator {
         expression = expression.replace("×", "*");
         expression = expression.replace("÷", "/");
         expression = expression.replace("%", "(1/100)");
-        // Insert * if ')' is followed by anything except ')' or an operator (+, -, *, /, ^)
-        expression = expression.replaceAll("\\)(?=[^)+\\-*/^])", ")*");
-        // Insert * if number is followed by anything except ')', digit, '.', 'E', or operator (+, -, *, /, ^)
-        expression = expression.replaceAll("(\\d)(?=[^)\\d+\\-*/^.E])", "$1*");
-        // Insert * if π or ∞ are followed by anything except ')' or an operator (+, -, *, /, ^)
-        expression = expression.replaceAll("([π∞])(?=[^)+\\-*/^])", "$1*");
-        // Insert * if standalone constant 'e' is followed by anything except ')' or an operator (+, -, *, /, ^) or letter
-        expression = expression.replaceAll("(?<![a-zA-Z_])e(?=[^)+\\-*/^a-zA-Z_])", "e*");
+        // Insert * if ')' is followed by anything except ')', comma, or an operator (+, -, *, /, ^)
+        expression = expression.replaceAll("\\)(?=[^)+\\-*/^,])", ")*");
+        // Insert * if number is followed by anything except ')', digit, '.', 'E', comma, or operator (+, -, *, /, ^)
+        expression = expression.replaceAll("(\\d)(?=[^)\\d+\\-*/^.E,])", "$1*");
+        // Insert * if π or ∞ are followed by anything except ')', comma, or an operator (+, -, *, /, ^)
+        expression = expression.replaceAll("([π∞])(?=[^)+\\-*/^,])", "$1*");
+        // Insert * if standalone constant 'e' is followed by anything except ')', comma, or an operator (+, -, *, /, ^) or letter
+        expression = expression.replaceAll("(?<![a-zA-Z_])e(?=[^)+\\-*/^a-zA-Z_,])", "e*");
         return expression;
     }
 }

@@ -43,6 +43,9 @@ public class Lexer {
             } else if (currentChar == ')') {
                 tokens.add(new Token(TokenType.PAREN_CLOSE, ")"));
                 index++;
+            } else if (currentChar == ',') {
+                tokens.add(new Token(TokenType.COMMA, ","));
+                index++;
             } else if (currentChar == '\u221a' || currentChar == '\u221b') { // √ or ∛
                 tokens.add(new Token(TokenType.ROOT, String.valueOf(currentChar)));
                 index++;

@@ -5,6 +5,7 @@ import io.github.iamrushier.evaluator.config.EvaluationConfig;
 import io.github.iamrushier.evaluator.function.Function;
 import io.github.iamrushier.evaluator.function.LogarithmicFunction;
 import io.github.iamrushier.evaluator.function.TrigonometricFunction;
+import io.github.iamrushier.evaluator.function.UtilityFunction;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -16,6 +17,7 @@ public class OperationRegistry {
     private static final Map<String, Function> functions = new HashMap<>();
 
     static {
+        // Trigonometric
         registerFunction("sin", (arg, config) ->
             new Operand(TrigonometricFunction.sin(arg.getAsBigDecimal(), getMode(config))));
         registerFunction("cos", (arg, config) ->
@@ -28,35 +30,31 @@ public class OperationRegistry {
             new Operand(TrigonometricFunction.acos(arg.getAsBigDecimal(), getMode(config))));
         registerFunction("atan", (arg, config) ->
             new Operand(TrigonometricFunction.atan(arg.getAsDouble(), getMode(config))));
+
+        // Logarithmic
         registerFunction("log", (arg, config) ->
             new Operand(LogarithmicFunction.log(arg.getAsBigDecimal())));
         registerFunction("ln", (arg, config) ->
             new Operand(LogarithmicFunction.ln(arg.getAsBigDecimal())));
+
+        // Utility & Multi-argument
+        registerFunction("abs", UtilityFunction.ABS);
+        registerFunction("floor", UtilityFunction.FLOOR);
+        registerFunction("ceil", UtilityFunction.CEIL);
+        registerFunction("round", UtilityFunction.ROUND);
+        registerFunction("min", UtilityFunction.MIN);
+        registerFunction("max", UtilityFunction.MAX);
     }
 
     private static AngleMode getMode(EvaluationConfig config) {
         return config != null ? config.getAngleMode() : AngleMode.DEGREES;
     }
 
-    private static void registerFunction(String name, ConfigurableFunction func) {
-        functions.put(name, func);
+    private static void registerFunction(String name, Function func) {
+        functions.put(name.toLowerCase(), func);
     }
 
     private OperationRegistry() {}
-
-    /**
-     * Functional interface for functions supporting evaluation configuration.
-     */
-    @FunctionalInterface
-    public interface ConfigurableFunction extends Function {
-        @Override
-        default Operand apply(Operand argument) {
-            return apply(argument, EvaluationConfig.defaultConfig());
-        }
-
-        @Override
-        Operand apply(Operand argument, EvaluationConfig config);
-    }
 
     /**
      * Checks if a function name is registered in the registry.
@@ -71,9 +69,10 @@ public class OperationRegistry {
     /**
      * Retrieves a function by name.
      * @param name The name of the function.
-     * @return The Function implementation, or null if not found.
+     * @return The Function, or null if not found.
      */
     public static Function getFunction(String name) {
-        return functions.get(name);
+        if (name == null) return null;
+        return functions.get(name.toLowerCase());
     }
 }

@@ -1,28 +1,104 @@
 package io.github.iamrushier.evaluator;
 
+import io.github.iamrushier.evaluator.ast.ExpressionNode;
 import io.github.iamrushier.evaluator.config.AngleMode;
 import io.github.iamrushier.evaluator.config.EvaluationConfig;
 import io.github.iamrushier.evaluator.exception.DomainException;
 import io.github.iamrushier.evaluator.exception.SyntaxException;
-import io.github.iamrushier.evaluator.parser.ExpressionParser;
+import io.github.iamrushier.evaluator.expression.CompiledExpression;
+import io.github.iamrushier.evaluator.parser.AstParser;
+import io.github.iamrushier.evaluator.parser.Lexer;
+import io.github.iamrushier.evaluator.util.ExpressionCache;
 import io.github.iamrushier.evaluator.util.ExpressionValidator;
-import io.github.iamrushier.evaluator.util.Operand;
 
 import java.math.BigDecimal;
 import java.util.Map;
 
 /**
- * {@code RushEvaluator} is the primary entry point for evaluating mathematical expressions.
- * It provides static methods to evaluate expression strings and obtain results as formatted
- * strings, {@link BigDecimal}, or {@code double}.
+ * {@code RushEvaluator} is the primary entry point for evaluating and compiling mathematical expressions.
+ * It provides static methods to evaluate expressions directly or compile them into reusable {@link CompiledExpression}s
+ * with AST optimizations, constant folding, and thread-safe caching.
  */
 public class RushEvaluator {
+
+    private static final ExpressionCache CACHE = new ExpressionCache(256);
 
     /**
      * Private constructor to prevent instantiation of this utility class.
      */
     private RushEvaluator() {
     }
+
+    // ==================== Compilation Methods ====================
+
+    /**
+     * Compiles a mathematical expression into an immutable, thread-safe {@link CompiledExpression}
+     * using the default configuration (degrees angle mode).
+     *
+     * @param expression The mathematical expression string to compile.
+     * @return a {@link CompiledExpression} representing the parsed and optimized AST
+     * @throws SyntaxException if the expression is invalid
+     */
+    public static CompiledExpression compile(String expression) {
+        return compile(expression, EvaluationConfig.defaultConfig());
+    }
+
+    /**
+     * Compiles a mathematical expression into an immutable, thread-safe {@link CompiledExpression}
+     * with the specified {@link AngleMode}.
+     *
+     * @param expression The mathematical expression string to compile.
+     * @param angleMode The angle mode (DEGREES or RADIANS) to use.
+     * @return a {@link CompiledExpression} representing the parsed and optimized AST
+     * @throws SyntaxException if the expression is invalid
+     */
+    public static CompiledExpression compile(String expression, AngleMode angleMode) {
+        return compile(expression, new EvaluationConfig(angleMode));
+    }
+
+    /**
+     * Compiles a mathematical expression into an immutable, thread-safe {@link CompiledExpression}
+     * using the provided {@link EvaluationConfig}.
+     *
+     * @param expression The mathematical expression string to compile.
+     * @param config The evaluation configuration.
+     * @return a {@link CompiledExpression} representing the parsed and optimized AST
+     * @throws SyntaxException if the expression is invalid
+     */
+    public static CompiledExpression compile(String expression, EvaluationConfig config) {
+        if (config == null) {
+            config = EvaluationConfig.defaultConfig();
+        }
+
+        String cacheKey = ExpressionCache.computeKey(expression, config);
+        if (cacheKey != null) {
+            CompiledExpression cached = CACHE.get(cacheKey);
+            if (cached != null) {
+                return cached;
+            }
+        }
+
+        String validated = ExpressionValidator.validateExpression(expression);
+        Lexer lexer = new Lexer(validated);
+        AstParser parser = new AstParser(lexer.tokenize(), config);
+        ExpressionNode root = parser.parse();
+        CompiledExpression compiled = new CompiledExpression(expression, root, config);
+
+        if (cacheKey != null) {
+            CACHE.put(cacheKey, compiled);
+        }
+
+        return compiled;
+    }
+
+    /**
+     * Clears the internal compilation cache.
+     */
+    public static void clearCache() {
+        CACHE.clear();
+    }
+
+    // ==================== evaluate (String output) ====================
 
     /**
      * Evaluates a given mathematical expression string using default settings (degrees angle mode).
@@ -106,17 +182,10 @@ public class RushEvaluator {
         if (config == null) {
             config = EvaluationConfig.defaultConfig();
         }
-        expression = ExpressionValidator.validateExpression(expression);
-        ExpressionParser parser = new ExpressionParser(config);
-        String resultString = parser.parse(expression);
-
-        // Handle specific undefined cases
-        if (resultString.equals("NaN")) {
-            throw new DomainException("Undefined");
-        }
-
-        return resultString;
+        return compile(expression, config).evaluate(config);
     }
+
+    // ==================== evaluateToBigDecimal ====================
 
     /**
      * Evaluates an expression and returns the result directly as a {@link BigDecimal} using default settings.
@@ -200,15 +269,10 @@ public class RushEvaluator {
         if (config == null) {
             config = EvaluationConfig.defaultConfig();
         }
-        expression = ExpressionValidator.validateExpression(expression);
-        ExpressionParser parser = new ExpressionParser(config);
-        Operand operand = parser.parseToOperand(expression);
-
-        if (operand.isSpecial()) {
-            throw new DomainException("Result is non-finite (" + operand + ") and cannot be converted to BigDecimal");
-        }
-        return operand.getAsBigDecimal();
+        return compile(expression, config).evaluateToBigDecimal(config);
     }
+
+    // ==================== evaluateToDouble ====================
 
     /**
      * Evaluates an expression and returns the result as a primitive {@code double} using default settings.
@@ -292,14 +356,6 @@ public class RushEvaluator {
         if (config == null) {
             config = EvaluationConfig.defaultConfig();
         }
-        expression = ExpressionValidator.validateExpression(expression);
-        ExpressionParser parser = new ExpressionParser(config);
-        Operand operand = parser.parseToOperand(expression);
-        double val = operand.getAsDouble();
-
-        if (Double.isNaN(val)) {
-            throw new DomainException("Undefined");
-        }
-        return val;
+        return compile(expression, config).evaluateToDouble(config);
     }
 }

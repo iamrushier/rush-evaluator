@@ -1,6 +1,8 @@
 package io.github.iamrushier.evaluator.config;
 
+import io.github.iamrushier.evaluator.function.Function;
 import io.github.iamrushier.evaluator.util.Operand;
+import io.github.iamrushier.evaluator.util.OperationRegistry;
 import java.math.MathContext;
 import java.util.Collections;
 import java.util.HashMap;
@@ -13,21 +15,22 @@ import java.util.Objects;
  */
 public final class EvaluationConfig {
 
-    private static final EvaluationConfig DEFAULT = new EvaluationConfig(AngleMode.DEGREES, MathContext.DECIMAL128, Collections.emptyMap());
-    private static final EvaluationConfig RADIANS = new EvaluationConfig(AngleMode.RADIANS, MathContext.DECIMAL128, Collections.emptyMap());
+    private static final EvaluationConfig DEFAULT = new EvaluationConfig(AngleMode.DEGREES, MathContext.DECIMAL128, Collections.emptyMap(), Collections.emptyMap());
+    private static final EvaluationConfig RADIANS = new EvaluationConfig(AngleMode.RADIANS, MathContext.DECIMAL128, Collections.emptyMap(), Collections.emptyMap());
 
     private final AngleMode angleMode;
     private final MathContext mathContext;
     private final Map<String, Operand> variables;
+    private final Map<String, Function> functions;
 
     /**
      * Constructs an {@code EvaluationConfig} with the specified angle mode, default {@link MathContext#DECIMAL128},
-     * and no variable bindings.
+     * and no variable bindings or custom functions.
      *
      * @param angleMode the unit of measurement for angles (cannot be null)
      */
     public EvaluationConfig(AngleMode angleMode) {
-        this(angleMode, MathContext.DECIMAL128, Collections.emptyMap());
+        this(angleMode, MathContext.DECIMAL128, Collections.emptyMap(), Collections.emptyMap());
     }
 
     /**
@@ -37,7 +40,7 @@ public final class EvaluationConfig {
      * @param mathContext the MathContext for precision and rounding (cannot be null)
      */
     public EvaluationConfig(AngleMode angleMode, MathContext mathContext) {
-        this(angleMode, mathContext, Collections.emptyMap());
+        this(angleMode, mathContext, Collections.emptyMap(), Collections.emptyMap());
     }
 
     /**
@@ -48,9 +51,22 @@ public final class EvaluationConfig {
      * @param variables map of variable names to their values (can be null or empty)
      */
     public EvaluationConfig(AngleMode angleMode, MathContext mathContext, Map<String, ?> variables) {
+        this(angleMode, mathContext, variables, Collections.emptyMap());
+    }
+
+    /**
+     * Constructs an {@code EvaluationConfig} with angle mode, math context, variable bindings, and custom functions.
+     *
+     * @param angleMode the unit of measurement for angles (cannot be null)
+     * @param mathContext the MathContext for precision and rounding (cannot be null)
+     * @param variables map of variable names to their values (can be null or empty)
+     * @param functions map of custom function names to implementations (can be null or empty)
+     */
+    public EvaluationConfig(AngleMode angleMode, MathContext mathContext, Map<String, ?> variables, Map<String, Function> functions) {
         this.angleMode = Objects.requireNonNull(angleMode, "angleMode must not be null");
         this.mathContext = Objects.requireNonNull(mathContext, "mathContext must not be null");
         this.variables = convertVariables(variables);
+        this.functions = convertFunctions(functions);
     }
 
     private static Map<String, Operand> convertVariables(Map<String, ?> variables) {
@@ -61,6 +77,19 @@ public final class EvaluationConfig {
         for (Map.Entry<String, ?> entry : variables.entrySet()) {
             if (entry.getKey() != null) {
                 map.put(entry.getKey(), Operand.of(entry.getValue()));
+            }
+        }
+        return Collections.unmodifiableMap(map);
+    }
+
+    private static Map<String, Function> convertFunctions(Map<String, Function> funcs) {
+        if (funcs == null || funcs.isEmpty()) {
+            return Collections.emptyMap();
+        }
+        Map<String, Function> map = new HashMap<>(funcs.size());
+        for (Map.Entry<String, Function> entry : funcs.entrySet()) {
+            if (entry.getKey() != null && entry.getValue() != null) {
+                map.put(entry.getKey().toLowerCase(), entry.getValue());
             }
         }
         return Collections.unmodifiableMap(map);
@@ -141,13 +170,48 @@ public final class EvaluationConfig {
     }
 
     /**
+     * Checks if a function with the specified name is known (either custom or built-in).
+     *
+     * @param name the function name
+     * @return {@code true} if registered, {@code false} otherwise
+     */
+    public boolean hasFunction(String name) {
+        if (name == null) return false;
+        return functions.containsKey(name.toLowerCase()) || OperationRegistry.isFunction(name);
+    }
+
+    /**
+     * Retrieves the function implementation by name, preferring custom functions over built-ins.
+     *
+     * @param name the function name
+     * @return the {@link Function} implementation, or {@code null} if not found
+     */
+    public Function getFunction(String name) {
+        if (name == null) return null;
+        Function custom = functions.get(name.toLowerCase());
+        if (custom != null) {
+            return custom;
+        }
+        return OperationRegistry.getFunction(name);
+    }
+
+    /**
+     * Returns an unmodifiable map of custom functions bound to this configuration.
+     *
+     * @return map of lowercase function names to {@link Function} implementations
+     */
+    public Map<String, Function> getCustomFunctions() {
+        return functions;
+    }
+
+    /**
      * Returns a copy of this configuration with the specified angle mode.
      *
      * @param mode the new angle mode
      * @return a new EvaluationConfig instance
      */
     public EvaluationConfig withAngleMode(AngleMode mode) {
-        return new EvaluationConfig(mode, this.mathContext, this.variables);
+        return new EvaluationConfig(mode, this.mathContext, this.variables, this.functions);
     }
 
     /**
@@ -157,7 +221,7 @@ public final class EvaluationConfig {
      * @return a new EvaluationConfig instance
      */
     public EvaluationConfig withMathContext(MathContext context) {
-        return new EvaluationConfig(this.angleMode, context, this.variables);
+        return new EvaluationConfig(this.angleMode, context, this.variables, this.functions);
     }
 
     /**
@@ -171,7 +235,7 @@ public final class EvaluationConfig {
         Objects.requireNonNull(name, "Variable name must not be null");
         Map<String, Operand> newVars = new HashMap<>(this.variables);
         newVars.put(name, Operand.of(value));
-        return new EvaluationConfig(this.angleMode, this.mathContext, newVars);
+        return new EvaluationConfig(this.angleMode, this.mathContext, newVars, this.functions);
     }
 
     /**
@@ -190,6 +254,21 @@ public final class EvaluationConfig {
                 newVars.put(entry.getKey(), Operand.of(entry.getValue()));
             }
         }
-        return new EvaluationConfig(this.angleMode, this.mathContext, newVars);
+        return new EvaluationConfig(this.angleMode, this.mathContext, newVars, this.functions);
+    }
+
+    /**
+     * Returns a copy of this configuration with a custom function registered.
+     *
+     * @param name the function name (cannot be null)
+     * @param function the function implementation (cannot be null)
+     * @return a new EvaluationConfig instance
+     */
+    public EvaluationConfig withFunction(String name, Function function) {
+        Objects.requireNonNull(name, "Function name must not be null");
+        Objects.requireNonNull(function, "Function must not be null");
+        Map<String, Function> newFuncs = new HashMap<>(this.functions);
+        newFuncs.put(name.toLowerCase(), function);
+        return new EvaluationConfig(this.angleMode, this.mathContext, this.variables, newFuncs);
     }
 }
