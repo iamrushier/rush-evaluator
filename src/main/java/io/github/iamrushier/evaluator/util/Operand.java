@@ -59,6 +59,36 @@ public class Operand {
     }
 
     /**
+     * Creates an {@code Operand} from an arbitrary object (Number, BigDecimal, String, etc.).
+     *
+     * @param value the object representing the numerical value
+     * @return a new {@code Operand}
+     * @throws IllegalArgumentException if value is null
+     * @throws NumberFormatException if value cannot be parsed as a number
+     */
+    public static Operand of(Object value) {
+        if (value == null) {
+            throw new IllegalArgumentException("Value must not be null");
+        }
+        if (value instanceof Operand) {
+            return (Operand) value;
+        }
+        if (value instanceof BigDecimal) {
+            return new Operand((BigDecimal) value);
+        }
+        if (value instanceof java.math.BigInteger) {
+            return new Operand(new BigDecimal((java.math.BigInteger) value));
+        }
+        if (value instanceof Integer || value instanceof Long || value instanceof Short || value instanceof Byte) {
+            return new Operand(BigDecimal.valueOf(((Number) value).longValue()));
+        }
+        if (value instanceof Number) {
+            return new Operand(((Number) value).doubleValue());
+        }
+        return Operand.of(value.toString());
+    }
+
+    /**
      * Returns the value as a {@link BigDecimal}.
      *
      * @return the BigDecimal value

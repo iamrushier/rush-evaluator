@@ -107,19 +107,31 @@ public class ExpressionParser {
     }
 
     /**
-     * Parses a term, handling multiplication and division.
+     * Parses a term, handling multiplication, division, and implicit multiplication.
      */
     private Operand parseTerm() {
         Operand result = parsePower();
-        while (peek().getType() == TokenType.OPERATOR) {
-            String opValue = peek().getValue();
-            if (opValue.equals("*") || opValue.equals("/")) {
-                eat();
-                if (peek().getType() == TokenType.OPERATOR || peek().getType() == TokenType.EOF) {
-                    throw new SyntaxException("Invalid expression");
+        while (true) {
+            if (peek().getType() == TokenType.OPERATOR) {
+                String opValue = peek().getValue();
+                if (opValue.equals("*") || opValue.equals("/")) {
+                    eat();
+                    if (peek().getType() == TokenType.OPERATOR || peek().getType() == TokenType.EOF) {
+                        throw new SyntaxException("Invalid expression");
+                    }
+                    Operand nextFactor = parsePower();
+                    result = CalculationEngine.calculate(result, nextFactor, opValue.charAt(0));
+                } else {
+                    break;
                 }
+            } else if (peek().getType() == TokenType.PAREN_OPEN
+                    || peek().getType() == TokenType.VARIABLE
+                    || peek().getType() == TokenType.FUNCTION
+                    || peek().getType() == TokenType.CONSTANT
+                    || peek().getType() == TokenType.ROOT) {
+                // Implicit multiplication: e.g. x(y + 1), (x)(y), x sin(y), 2x
                 Operand nextFactor = parsePower();
-                result = CalculationEngine.calculate(result, nextFactor, opValue.charAt(0));
+                result = CalculationEngine.calculate(result, nextFactor, '*');
             } else {
                 break;
             }
@@ -143,7 +155,7 @@ public class ExpressionParser {
     }
 
     /**
-     * Parses a factor: numbers, parenthesized expressions, constants, roots, or functions.
+     * Parses a factor: numbers, parenthesized expressions, constants, roots, functions, or variables.
      */
     private Operand parseFactor() {
         boolean isNegative = false;
@@ -187,6 +199,12 @@ public class ExpressionParser {
             result = parseFunction();
         } else if (peek().getType() == TokenType.NUMBER) {
             result = Operand.of(eat().getValue());
+        } else if (peek().getType() == TokenType.VARIABLE) {
+            String varName = eat().getValue();
+            if (!config.hasVariable(varName)) {
+                throw new SyntaxException("Undefined variable: " + varName);
+            }
+            result = config.getVariable(varName);
         } else {
             throw new SyntaxException("Invalid expression");
         }

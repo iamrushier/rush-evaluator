@@ -59,6 +59,16 @@ public class OperationRegistry {
     }
 
     /**
+     * Checks if a function name is registered in the registry.
+     *
+     * @param name The name of the function.
+     * @return {@code true} if registered, {@code false} otherwise.
+     */
+    public static boolean isFunction(String name) {
+        return name != null && functions.containsKey(name.toLowerCase());
+    }
+
+    /**
      * Retrieves a function by name.
      * @param name The name of the function.
      * @return The Function implementation, or null if not found.

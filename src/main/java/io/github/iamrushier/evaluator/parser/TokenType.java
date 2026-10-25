@@ -14,6 +14,8 @@ public enum TokenType {
     FUNCTION,
     /** A mathematical constant (π, e, ∞). */
     CONSTANT,
+    /** An algebraic variable identifier (e.g. x, y, my_var). */
+    VARIABLE,
     /** An opening parenthesis '('. */
     PAREN_OPEN,
     /** A closing parenthesis ')'. */

@@ -39,7 +39,7 @@ jobs:
         run: chmod +x gradlew
 
       - name: Run unit tests
-        run: ./gradlew test --no-daemon
+        run: ./gradlew test jacocoTestReport --no-daemon
 
       - name: Build and verify Javadoc
         run: ./gradlew build javadoc --no-daemon

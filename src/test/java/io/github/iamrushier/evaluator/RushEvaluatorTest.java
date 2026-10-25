@@ -21,6 +21,10 @@ public class RushEvaluatorTest {
         assertEquals("(2)*(3)", ExpressionValidator.validateExpression("(2)(3)"));
         assertEquals("2*π", ExpressionValidator.validateExpression("2π"));
         assertEquals("sin(30)*2", ExpressionValidator.validateExpression("sin(30)2"));
+        assertEquals("2*x", ExpressionValidator.validateExpression("2x"));
+        assertEquals("(x)*(y)", ExpressionValidator.validateExpression("(x)(y)"));
+        assertEquals("e*2", ExpressionValidator.validateExpression("e2"));
+        assertEquals("speed+5", ExpressionValidator.validateExpression("speed + 5"));
     }
 
     @Test

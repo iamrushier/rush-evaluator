@@ -1,6 +1,7 @@
 package io.github.iamrushier.evaluator.parser;
 
 import io.github.iamrushier.evaluator.exception.SyntaxException;
+import io.github.iamrushier.evaluator.util.OperationRegistry;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -48,12 +49,14 @@ public class Lexer {
             } else if (currentChar == '\u03c0' || currentChar == '\u221e') { // π or ∞
                 tokens.add(new Token(TokenType.CONSTANT, String.valueOf(currentChar)));
                 index++;
-            } else if (Character.isLetter(currentChar)) {
+            } else if (Character.isLetter(currentChar) || currentChar == '_') {
                 String word = parseWord();
                 if (isConstant(word)) {
                     tokens.add(new Token(TokenType.CONSTANT, word));
-                } else {
+                } else if (OperationRegistry.isFunction(word)) {
                     tokens.add(new Token(TokenType.FUNCTION, word));
+                } else {
+                    tokens.add(new Token(TokenType.VARIABLE, word));
                 }
             } else {
                 // Ignore whitespace if any remained, otherwise throw
@@ -97,7 +100,7 @@ public class Lexer {
 
     private String parseWord() {
         StringBuilder sb = new StringBuilder();
-        while (index < input.length() && Character.isLetter(input.charAt(index))) {
+        while (index < input.length() && (Character.isLetterOrDigit(input.charAt(index)) || input.charAt(index) == '_')) {
             sb.append(input.charAt(index));
             index++;
         }

@@ -9,6 +9,7 @@ import io.github.iamrushier.evaluator.util.ExpressionValidator;
 import io.github.iamrushier.evaluator.util.Operand;
 
 import java.math.BigDecimal;
+import java.util.Map;
 
 /**
  * {@code RushEvaluator} is the primary entry point for evaluating mathematical expressions.
@@ -46,6 +47,50 @@ public class RushEvaluator {
      */
     public static String evaluate(String expression, AngleMode angleMode) {
         return evaluate(expression, new EvaluationConfig(angleMode));
+    }
+
+    /**
+     * Evaluates a mathematical expression string with variable bindings using default settings.
+     *
+     * @param expression The mathematical expression string to evaluate.
+     * @param variables Map of variable names to their values.
+     * @return The result of the evaluation as a formatted string.
+     * @throws DomainException if the result is undefined or leads to a domain error.
+     * @throws SyntaxException if the expression is invalid or contains undefined variables.
+     */
+    public static String evaluate(String expression, Map<String, ?> variables) {
+        return evaluate(expression, EvaluationConfig.defaultConfig().withVariables(variables));
+    }
+
+    /**
+     * Evaluates a mathematical expression string with variable bindings and the specified {@link AngleMode}.
+     *
+     * @param expression The mathematical expression string to evaluate.
+     * @param variables Map of variable names to their values.
+     * @param angleMode The angle mode (DEGREES or RADIANS) to use.
+     * @return The result of the evaluation as a formatted string.
+     * @throws DomainException if the result is undefined or leads to a domain error.
+     * @throws SyntaxException if the expression is invalid or contains undefined variables.
+     */
+    public static String evaluate(String expression, Map<String, ?> variables, AngleMode angleMode) {
+        return evaluate(expression, new EvaluationConfig(angleMode).withVariables(variables));
+    }
+
+    /**
+     * Evaluates a mathematical expression string with variable bindings using the provided {@link EvaluationConfig}.
+     *
+     * @param expression The mathematical expression string to evaluate.
+     * @param variables Map of variable names to their values.
+     * @param config The evaluation configuration.
+     * @return The result of the evaluation as a formatted string.
+     * @throws DomainException if the result is undefined or leads to a domain error.
+     * @throws SyntaxException if the expression is invalid or contains undefined variables.
+     */
+    public static String evaluate(String expression, Map<String, ?> variables, EvaluationConfig config) {
+        if (config == null) {
+            config = EvaluationConfig.defaultConfig();
+        }
+        return evaluate(expression, config.withVariables(variables));
     }
 
     /**
@@ -99,6 +144,50 @@ public class RushEvaluator {
     }
 
     /**
+     * Evaluates an expression with variables and returns the result as a {@link BigDecimal} using default settings.
+     *
+     * @param expression The mathematical expression string to evaluate.
+     * @param variables Map of variable names to their values.
+     * @return The evaluated result as a {@link BigDecimal}.
+     * @throws DomainException if the result is non-finite or leads to a domain error.
+     * @throws SyntaxException if the expression is invalid or contains undefined variables.
+     */
+    public static BigDecimal evaluateToBigDecimal(String expression, Map<String, ?> variables) {
+        return evaluateToBigDecimal(expression, EvaluationConfig.defaultConfig().withVariables(variables));
+    }
+
+    /**
+     * Evaluates an expression with variables and returns the result as a {@link BigDecimal} with the specified {@link AngleMode}.
+     *
+     * @param expression The mathematical expression string to evaluate.
+     * @param variables Map of variable names to their values.
+     * @param angleMode The angle mode to use.
+     * @return The evaluated result as a {@link BigDecimal}.
+     * @throws DomainException if the result is non-finite or leads to a domain error.
+     * @throws SyntaxException if the expression is invalid or contains undefined variables.
+     */
+    public static BigDecimal evaluateToBigDecimal(String expression, Map<String, ?> variables, AngleMode angleMode) {
+        return evaluateToBigDecimal(expression, new EvaluationConfig(angleMode).withVariables(variables));
+    }
+
+    /**
+     * Evaluates an expression with variables and returns the result as a {@link BigDecimal} using the provided {@link EvaluationConfig}.
+     *
+     * @param expression The mathematical expression string to evaluate.
+     * @param variables Map of variable names to their values.
+     * @param config The evaluation configuration.
+     * @return The evaluated result as a {@link BigDecimal}.
+     * @throws DomainException if the result is non-finite or leads to a domain error.
+     * @throws SyntaxException if the expression is invalid or contains undefined variables.
+     */
+    public static BigDecimal evaluateToBigDecimal(String expression, Map<String, ?> variables, EvaluationConfig config) {
+        if (config == null) {
+            config = EvaluationConfig.defaultConfig();
+        }
+        return evaluateToBigDecimal(expression, config.withVariables(variables));
+    }
+
+    /**
      * Evaluates an expression and returns the result directly as a {@link BigDecimal} using the provided {@link EvaluationConfig}.
      *
      * @param expression The mathematical expression string to evaluate.
@@ -144,6 +233,50 @@ public class RushEvaluator {
      */
     public static double evaluateToDouble(String expression, AngleMode angleMode) {
         return evaluateToDouble(expression, new EvaluationConfig(angleMode));
+    }
+
+    /**
+     * Evaluates an expression with variables and returns the result as a primitive {@code double} using default settings.
+     *
+     * @param expression The mathematical expression string to evaluate.
+     * @param variables Map of variable names to their values.
+     * @return The evaluated result as a double.
+     * @throws DomainException if the expression results in an undefined value.
+     * @throws SyntaxException if the expression is invalid or contains undefined variables.
+     */
+    public static double evaluateToDouble(String expression, Map<String, ?> variables) {
+        return evaluateToDouble(expression, EvaluationConfig.defaultConfig().withVariables(variables));
+    }
+
+    /**
+     * Evaluates an expression with variables and returns the result as a primitive {@code double} with the specified {@link AngleMode}.
+     *
+     * @param expression The mathematical expression string to evaluate.
+     * @param variables Map of variable names to their values.
+     * @param angleMode The angle mode to use.
+     * @return The evaluated result as a double.
+     * @throws DomainException if the expression results in an undefined value.
+     * @throws SyntaxException if the expression is invalid or contains undefined variables.
+     */
+    public static double evaluateToDouble(String expression, Map<String, ?> variables, AngleMode angleMode) {
+        return evaluateToDouble(expression, new EvaluationConfig(angleMode).withVariables(variables));
+    }
+
+    /**
+     * Evaluates an expression with variables and returns the result as a primitive {@code double} using the provided {@link EvaluationConfig}.
+     *
+     * @param expression The mathematical expression string to evaluate.
+     * @param variables Map of variable names to their values.
+     * @param config The evaluation configuration.
+     * @return The evaluated result as a double.
+     * @throws DomainException if the expression results in an undefined value.
+     * @throws SyntaxException if the expression is invalid or contains undefined variables.
+     */
+    public static double evaluateToDouble(String expression, Map<String, ?> variables, EvaluationConfig config) {
+        if (config == null) {
+            config = EvaluationConfig.defaultConfig();
+        }
+        return evaluateToDouble(expression, config.withVariables(variables));
     }
 
     /**

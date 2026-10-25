@@ -4,6 +4,7 @@
 [![CI](https://github.com/iamrushier/rush-evaluator/actions/workflows/ci.yml/badge.svg)](https://github.com/iamrushier/rush-evaluator/actions/workflows/ci.yml)
 [![License](https://img.shields.io/badge/License-Apache_2.0-blue.svg)](LICENSE)
 [![Java Version](https://img.shields.io/badge/Java-8%2B-orange.svg)]()
+[![Javadoc](https://img.shields.io/badge/Javadoc-API_Docs-blue.svg)](https://iamrushier.github.io/rush-evaluator/)
 [![GitHub Release](https://img.shields.io/github/v/release/iamrushier/rush-evaluator)](https://github.com/iamrushier/rush-evaluator/releases)
 
 **RushEvaluator** is a high-precision mathematical expression evaluator library for Java. Built with a formal Lexer and Recursive Descent Parser, it evaluates complex mathematical strings with internal `BigDecimal` calculations for precision, automatic double fallback, implicit multiplication, and support for unicode math symbols.
@@ -38,6 +39,7 @@ implementation("io.github.iamrushier:rush-evaluator:2.1.1")
 ## ✨ Key Features
 
 - **💎 High Precision:** Calculations default to `BigDecimal` with `DECIMAL128` precision, seamlessly falling back to `double` only when necessary.
+- **🏷️ Variable Evaluation:** Dynamic algebraic variables (`x + y`, `2x`, `x(y + 1)`) with full support for `Number`, `BigDecimal`, and numeric string bindings.
 - **📐 Complete Arithmetic & Operators:**
   - Standard arithmetic: `+`, `-`, `*` (or `×`), `/` (or `÷`)
   - Exponents and Roots: Exponentiation (`^`), Square Root (`√`), and Cube Root (`∛`)
@@ -79,6 +81,13 @@ public class Main {
 
         // Implicit multiplication and percentage
         String res4 = RushEvaluator.evaluate("50% * 200 + 2(3 + 4)"); // "114"
+
+        // Algebraic variables and implicit variable multiplication
+        Map<String, Object> vars = new HashMap<>();
+        vars.put("x", 4);
+        vars.put("y", 3);
+        String res5 = RushEvaluator.evaluate("2x + 3y^2", vars); // "35"
+        String res6 = RushEvaluator.evaluate("x(y + 1)", vars);   // "16"
     }
 }
 ```
