@@ -39,7 +39,18 @@ jobs:
         run: chmod +x gradlew
 
       - name: Run unit tests
-        run: ./gradlew test jacocoTestReport --no-daemon
+        run: ./gradlew test jacocoTestReport --no-daemon --info
+
+      - name: Display test failure reports
+        if: failure()
+        shell: bash
+        run: |
+          for file in build/test-results/test/TEST-*.xml; do
+            if [ -f "$file" ]; then
+              echo "==================== $file ===================="
+              cat "$file"
+            fi
+          done
 
       - name: Build and verify Javadoc
         run: ./gradlew build javadoc --no-daemon

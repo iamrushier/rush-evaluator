@@ -38,8 +38,8 @@ public class ExpressionValidator {
         expression = expression.replaceAll("(\\d)(?=[^)\\d+\\-*/^.E])", "$1*");
         // Insert * if π or ∞ are followed by anything except ')' or an operator (+, -, *, /, ^)
         expression = expression.replaceAll("([π∞])(?=[^)+\\-*/^])", "$1*");
-        // Insert * if standalone constant 'e' is followed by anything except ')' or an operator (+, -, *, /, ^) or identifier character
-        expression = expression.replaceAll("(?<![a-zA-Z0-9_])e(?=[^)+\\-*/^a-zA-Z0-9_])", "e*");
+        // Insert * if standalone constant 'e' is followed by anything except ')' or an operator (+, -, *, /, ^) or letter
+        expression = expression.replaceAll("(?<![a-zA-Z_])e(?=[^)+\\-*/^a-zA-Z_])", "e*");
         return expression;
     }
 }
