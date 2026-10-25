@@ -1,10 +1,11 @@
 package io.github.iamrushier.evaluator.util;
 
+import io.github.iamrushier.evaluator.exception.DomainException;
 import java.math.BigDecimal;
 
 /**
  * {@code Operand} represents a numerical value in an expression.
- * It can wrap a {@code BigDecimal} for high precision or a {@code double} as a fallback.
+ * It wraps either a {@link BigDecimal} for high precision or a {@code double} as a fallback.
  */
 public class Operand {
     private final BigDecimal bigDecimalValue;
@@ -54,13 +55,7 @@ public class Operand {
             return new Operand(new BigDecimal(value));
         } catch (NumberFormatException e) {
             // Check for scientific notation or other double formats
-            try {
-                return new Operand(Double.parseDouble(value));
-            } catch (NumberFormatException e2) {
-                // If it's a very large number that BigDecimal can't handle as a string directly
-                // though usually BigDecimal handles any size if format is correct.
-                throw e2;
-            }
+            return new Operand(Double.parseDouble(value));
         }
     }
 
@@ -68,14 +63,14 @@ public class Operand {
      * Returns the value as a {@link BigDecimal}.
      *
      * @return the BigDecimal value
+     * @throws DomainException if this operand represents a non-finite value (Infinity or NaN)
      */
     public BigDecimal getAsBigDecimal() {
-        if (bigDecimalValue != null) return bigDecimalValue;
-        if (doubleValue.isInfinite()) {
-             // Return a very large value or throw? 
-             // Better to let the operation handle it or return null.
-             // For now, consistent with existing logic.
-             return BigDecimal.valueOf(doubleValue);
+        if (bigDecimalValue != null) {
+            return bigDecimalValue;
+        }
+        if (doubleValue != null && (doubleValue.isInfinite() || doubleValue.isNaN())) {
+            throw new DomainException("Cannot convert non-finite value (" + doubleValue + ") to BigDecimal");
         }
         return BigDecimal.valueOf(doubleValue);
     }
@@ -86,7 +81,9 @@ public class Operand {
      * @return the double value
      */
     public double getAsDouble() {
-        if (doubleValue != null) return doubleValue;
+        if (doubleValue != null) {
+            return doubleValue;
+        }
         return bigDecimalValue.doubleValue();
     }
 
@@ -111,21 +108,21 @@ public class Operand {
     @Override
     public String toString() {
         if (isSpecial) {
-            if (Double.isInfinite(doubleValue)) return doubleValue > 0 ? "∞" : "-∞";
+            if (Double.isInfinite(doubleValue)) {
+                return doubleValue > 0 ? "∞" : "-∞";
+            }
             return "NaN";
         }
-        
-        BigDecimal bd;
+
         if (bigDecimalValue != null) {
-            bd = bigDecimalValue;
-        } else {
-            // For double results, check if it should be scientific or plain
-            String doubleStr = String.valueOf(doubleValue);
-            if (doubleStr.contains("E") || doubleStr.contains("e")) {
-                return OutputFormatter.consistentScientific(doubleStr);
-            }
-            bd = BigDecimal.valueOf(doubleValue);
+            return OutputFormatter.formatResult(bigDecimalValue);
         }
-        return OutputFormatter.formatResult(bd);
+
+        String doubleStr = String.valueOf(doubleValue);
+        if (doubleStr.contains("E") || doubleStr.contains("e")) {
+            return OutputFormatter.consistentScientific(doubleStr);
+        }
+
+        return OutputFormatter.formatDouble(doubleValue);
     }
 }

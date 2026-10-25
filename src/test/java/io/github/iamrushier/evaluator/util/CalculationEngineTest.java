@@ -1,5 +1,6 @@
 package io.github.iamrushier.evaluator.util;
 
+import io.github.iamrushier.evaluator.exception.DomainException;
 import org.junit.jupiter.api.Test;
 import java.math.BigDecimal;
 import static org.junit.jupiter.api.Assertions.*;
@@ -35,5 +36,20 @@ public class CalculationEngineTest {
     @Test
     void testInfinityHandling() {
         assertEquals("∞", CalculationEngine.calculate(Operand.of("1"), Operand.of("0"), '/').toString());
+    }
+
+    @Test
+    void testOperandSpecialConversionToBigDecimal() {
+        Operand inf = new Operand(Double.POSITIVE_INFINITY);
+        assertTrue(inf.isSpecial());
+        assertThrows(DomainException.class, inf::getAsBigDecimal);
+
+        Operand nan = new Operand(Double.NaN);
+        assertTrue(nan.isSpecial());
+        assertThrows(DomainException.class, nan::getAsBigDecimal);
+
+        Operand finite = new Operand(4.5);
+        assertFalse(finite.isSpecial());
+        assertEquals(0, new BigDecimal("4.5").compareTo(finite.getAsBigDecimal()));
     }
 }

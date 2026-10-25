@@ -3,14 +3,15 @@ package io.github.iamrushier.evaluator.operator;
 import io.github.iamrushier.evaluator.util.CalculationEngine;
 import io.github.iamrushier.evaluator.util.Operand;
 
-import java.math.BigDecimal;
-import java.math.MathContext;
-
 /**
  * {@code PowerOperator} provides a static method for calculating the power of a number.
  * It handles both positive and negative integer exponents, and attempts to use {@code BigDecimal}
  * for precision.
+ *
+ * @deprecated As of release 2.1.0, this class is deprecated in favor of internal {@link CalculationEngine}
+ *             evaluation and will be removed in a future major release.
  */
+@Deprecated
 public class PowerOperator {
     /**
      * Private constructor to prevent instantiation of this utility class.

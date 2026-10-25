@@ -3,13 +3,14 @@ package io.github.iamrushier.evaluator.operator;
 import io.github.iamrushier.evaluator.util.CalculationEngine;
 import io.github.iamrushier.evaluator.util.Operand;
 
-import java.math.BigDecimal;
-import java.math.MathContext;
-
 /**
  * {@code BasicOperator} provides static methods for performing basic arithmetic operations.
  * It handles addition, subtraction, multiplication, and division.
+ *
+ * @deprecated As of release 2.1.0, this class is deprecated in favor of internal {@link CalculationEngine}
+ *             evaluation and will be removed in a future major release.
  */
+@Deprecated
 public class BasicOperator {
 
     /**

@@ -7,7 +7,8 @@ import java.math.BigDecimal;
 
 /**
  * {@code TrigonometricFunction} provides static methods for handling various trigonometric operations.
- * It includes functions for sine, cosine, tangent, and their inverses, supporting both degrees and radians.
+ * It includes functions for sine, cosine, tangent, and their inverses, supporting both degrees and radians
+ * with direct numeric and formatted string outputs.
  */
 public class TrigonometricFunction {
 
@@ -32,7 +33,150 @@ public class TrigonometricFunction {
     }
 
     /**
-     * Calculates the sine of an angle in degrees.
+     * Calculates the sine of an angle as a {@code double}.
+     *
+     * @param angle The angle.
+     * @param mode The angle mode (DEGREES or RADIANS).
+     * @return The sine value as a double.
+     */
+    public static double sin(BigDecimal angle, AngleMode mode) {
+        if (mode == AngleMode.RADIANS) {
+            return Math.sin(angle.doubleValue());
+        }
+
+        BigDecimal normalizedAngle = normalizeAngle(angle);
+        double val = normalizedAngle.doubleValue();
+        if (val == 0 || val == 180) return 0.0;
+        if (val == 90) return 1.0;
+        if (val == 270) return -1.0;
+        if (val == 30 || val == 150) return 0.5;
+        if (val == 210 || val == 330) return -0.5;
+
+        return Math.sin(Math.toRadians(val));
+    }
+
+    /**
+     * Calculates the cosine of an angle as a {@code double}.
+     *
+     * @param angle The angle.
+     * @param mode The angle mode (DEGREES or RADIANS).
+     * @return The cosine value as a double.
+     */
+    public static double cos(BigDecimal angle, AngleMode mode) {
+        if (mode == AngleMode.RADIANS) {
+            return Math.cos(angle.doubleValue());
+        }
+
+        BigDecimal normalizedAngle = normalizeAngle(angle);
+        double val = normalizedAngle.doubleValue();
+        if (val == 90 || val == 270) return 0.0;
+        if (val == 0) return 1.0;
+        if (val == 180) return -1.0;
+        if (val == 60 || val == 300) return 0.5;
+        if (val == 120 || val == 240) return -0.5;
+
+        return Math.cos(Math.toRadians(val));
+    }
+
+    /**
+     * Calculates the tangent of an angle as a {@code double}.
+     *
+     * @param angle The angle.
+     * @param mode The angle mode (DEGREES or RADIANS).
+     * @return The tangent value as a double.
+     */
+    public static double tan(BigDecimal angle, AngleMode mode) {
+        if (mode == AngleMode.RADIANS) {
+            return Math.tan(angle.doubleValue());
+        }
+
+        BigDecimal normalizedAngle = normalizeAngle(angle);
+        double val = normalizedAngle.doubleValue();
+        if (val == 90 || val == 270) return Double.POSITIVE_INFINITY;
+        if (val == 0 || val == 180) return 0.0;
+        if (val == 45 || val == 225) return 1.0;
+        if (val == 135 || val == 315) return -1.0;
+
+        return Math.tan(Math.toRadians(val));
+    }
+
+    /**
+     * Calculates the inverse sine (arcsine) of a value as a {@code double}.
+     *
+     * @param value The value to calculate the arcsine of.
+     * @param mode The angle mode.
+     * @return The arcsine value.
+     * @throws DomainException if value is not in [-1, 1].
+     */
+    public static double asin(BigDecimal value, AngleMode mode) {
+        double val = value.doubleValue();
+        if (val < -1 || val > 1) {
+            throw new DomainException("Domain error");
+        }
+        if (mode == AngleMode.RADIANS) {
+            return Math.asin(val);
+        }
+
+        if (val == 0) return 0.0;
+        if (val == 1) return 90.0;
+        if (val == -1) return -90.0;
+        if (val == 0.5) return 30.0;
+        if (val == -0.5) return -30.0;
+
+        return Math.toDegrees(Math.asin(val));
+    }
+
+    /**
+     * Calculates the inverse cosine (arccosine) of a value as a {@code double}.
+     *
+     * @param value The value to calculate the arccosine of.
+     * @param mode The angle mode.
+     * @return The arccosine value.
+     * @throws DomainException if value is not in [-1, 1].
+     */
+    public static double acos(BigDecimal value, AngleMode mode) {
+        double val = value.doubleValue();
+        if (val < -1 || val > 1) {
+            throw new DomainException("Domain error");
+        }
+        if (mode == AngleMode.RADIANS) {
+            return Math.acos(val);
+        }
+
+        if (val == 0) return 90.0;
+        if (val == 1) return 0.0;
+        if (val == -1) return 180.0;
+        if (val == 0.5) return 60.0;
+        if (val == -0.5) return 120.0;
+
+        return Math.toDegrees(Math.acos(val));
+    }
+
+    /**
+     * Calculates the inverse tangent (arctangent) of a value as a {@code double}.
+     *
+     * @param value The value to calculate the arctangent of.
+     * @param mode The angle mode.
+     * @return The arctangent value.
+     */
+    public static double atan(double value, AngleMode mode) {
+        if (mode == AngleMode.RADIANS) {
+            return Math.atan(value);
+        }
+
+        if (value == Double.POSITIVE_INFINITY) return 90.0;
+        if (value == Double.NEGATIVE_INFINITY) return -90.0;
+        if (value == 0) return 0.0;
+        if (value == 1) return 45.0;
+        if (value == -1) return -45.0;
+
+        return Math.toDegrees(Math.atan(value));
+    }
+
+    // ================= String-based backward compatible methods =================
+
+    /**
+     * Calculates the sine of an angle in degrees as a formatted string.
      * @param angle The angle in degrees.
      * @return The sine value as a string.
      */
@@ -41,30 +185,17 @@ public class TrigonometricFunction {
     }
 
     /**
-     * Calculates the sine of an angle with the specified {@link AngleMode}.
+     * Calculates the sine of an angle with the specified {@link AngleMode} as a formatted string.
      * @param angle The angle.
      * @param mode The angle mode (DEGREES or RADIANS).
      * @return The sine value as a string.
      */
     public static String handleSin(BigDecimal angle, AngleMode mode) {
-        if (mode == AngleMode.RADIANS) {
-            double rad = angle.doubleValue();
-            return OutputFormatter.formatDouble(Math.sin(rad));
-        }
-
-        BigDecimal normalizedAngle = normalizeAngle(angle);
-        double val = normalizedAngle.doubleValue();
-        if (val == 0 || val == 180) return "0";
-        if (val == 90) return "1";
-        if (val == 270) return "-1";
-        if (val == 30 || val == 150) return "0.5";
-        if (val == 210 || val == 330) return "-0.5";
-        
-        return OutputFormatter.formatDouble(Math.sin(Math.toRadians(val)));
+        return OutputFormatter.formatDouble(sin(angle, mode));
     }
 
     /**
-     * Calculates the cosine of an angle in degrees.
+     * Calculates the cosine of an angle in degrees as a formatted string.
      * @param angle The angle in degrees.
      * @return The cosine value as a string.
      */
@@ -73,30 +204,17 @@ public class TrigonometricFunction {
     }
 
     /**
-     * Calculates the cosine of an angle with the specified {@link AngleMode}.
+     * Calculates the cosine of an angle with the specified {@link AngleMode} as a formatted string.
      * @param angle The angle.
      * @param mode The angle mode (DEGREES or RADIANS).
      * @return The cosine value as a string.
      */
     public static String handleCos(BigDecimal angle, AngleMode mode) {
-        if (mode == AngleMode.RADIANS) {
-            double rad = angle.doubleValue();
-            return OutputFormatter.formatDouble(Math.cos(rad));
-        }
-
-        BigDecimal normalizedAngle = normalizeAngle(angle);
-        double val = normalizedAngle.doubleValue();
-        if (val == 90 || val == 270) return "0";
-        if (val == 0) return "1";
-        if (val == 180) return "-1";
-        if (val == 60 || val == 300) return "0.5";
-        if (val == 120 || val == 240) return "-0.5";
-        
-        return OutputFormatter.formatDouble(Math.cos(Math.toRadians(val)));
+        return OutputFormatter.formatDouble(cos(angle, mode));
     }
 
     /**
-     * Calculates the tangent of an angle in degrees.
+     * Calculates the tangent of an angle in degrees as a formatted string.
      * @param angle The angle in degrees.
      * @return The tangent value as a string.
      */
@@ -105,29 +223,17 @@ public class TrigonometricFunction {
     }
 
     /**
-     * Calculates the tangent of an angle with the specified {@link AngleMode}.
+     * Calculates the tangent of an angle with the specified {@link AngleMode} as a formatted string.
      * @param angle The angle.
      * @param mode The angle mode (DEGREES or RADIANS).
      * @return The tangent value as a string.
      */
     public static String handleTan(BigDecimal angle, AngleMode mode) {
-        if (mode == AngleMode.RADIANS) {
-            double rad = angle.doubleValue();
-            return OutputFormatter.formatDouble(Math.tan(rad));
-        }
-
-        BigDecimal normalizedAngle = normalizeAngle(angle);
-        double val = normalizedAngle.doubleValue();
-        if (val == 90 || val == 270) return "Infinity";
-        if (val == 0 || val == 180) return "0";
-        if (val == 45 || val == 225) return "1";
-        if (val == 135 || val == 315) return "-1";
-        
-        return OutputFormatter.formatDouble(Math.tan(Math.toRadians(val)));
+        return OutputFormatter.formatDouble(tan(angle, mode));
     }
 
     /**
-     * Calculates the inverse sine (arcsine) of a value in degrees.
+     * Calculates the inverse sine (arcsine) of a value in degrees as a formatted string.
      * @param value The value to calculate the arcsine of.
      * @return The arcsine value in degrees as a string.
      */
@@ -136,32 +242,17 @@ public class TrigonometricFunction {
     }
 
     /**
-     * Calculates the inverse sine (arcsine) of a value with the specified {@link AngleMode}.
+     * Calculates the inverse sine (arcsine) of a value with the specified {@link AngleMode} as a formatted string.
      * @param value The value to calculate the arcsine of.
-     * @param mode The angle mode (DEGREES returns degrees, RADIANS returns radians).
+     * @param mode The angle mode.
      * @return The arcsine value as a string.
      */
     public static String handleAsin(BigDecimal value, AngleMode mode) {
-        double val = value.doubleValue();
-        if (val < -1 || val > 1) {
-            throw new DomainException("Domain error");
-        }
-        if (mode == AngleMode.RADIANS) {
-            if (val == 0) return "0";
-            return OutputFormatter.formatDouble(Math.asin(val));
-        }
-
-        if (val == 0) return "0";
-        if (val == 1) return "90";
-        if (val == -1) return "-90";
-        if (val == 0.5) return "30";
-        if (val == -0.5) return "-30";
-        
-        return OutputFormatter.formatDouble(Math.toDegrees(Math.asin(val)));
+        return OutputFormatter.formatDouble(asin(value, mode));
     }
 
     /**
-     * Calculates the inverse cosine (arccosine) of a value in degrees.
+     * Calculates the inverse cosine (arccosine) of a value in degrees as a formatted string.
      * @param value The value to calculate the arccosine of.
      * @return The arccosine value in degrees as a string.
      */
@@ -170,32 +261,17 @@ public class TrigonometricFunction {
     }
 
     /**
-     * Calculates the inverse cosine (arccosine) of a value with the specified {@link AngleMode}.
+     * Calculates the inverse cosine (arccosine) of a value with the specified {@link AngleMode} as a formatted string.
      * @param value The value to calculate the arccosine of.
-     * @param mode The angle mode (DEGREES returns degrees, RADIANS returns radians).
+     * @param mode The angle mode.
      * @return The arccosine value as a string.
      */
     public static String handleAcos(BigDecimal value, AngleMode mode) {
-        double val = value.doubleValue();
-        if (val < -1 || val > 1) {
-            throw new DomainException("Domain error");
-        }
-        if (mode == AngleMode.RADIANS) {
-            if (val == 1) return "0";
-            return OutputFormatter.formatDouble(Math.acos(val));
-        }
-
-        if (val == 0) return "90";
-        if (val == 1) return "0";
-        if (val == -1) return "180";
-        if (val == 0.5) return "60";
-        if (val == -0.5) return "120";
-        
-        return OutputFormatter.formatDouble(Math.toDegrees(Math.acos(val)));
+        return OutputFormatter.formatDouble(acos(value, mode));
     }
 
     /**
-     * Calculates the inverse tangent (arctangent) of a value in degrees.
+     * Calculates the inverse tangent (arctangent) of a value in degrees as a formatted string.
      * @param value The value to calculate the arctangent of.
      * @return The arctangent value in degrees as a string.
      */
@@ -204,33 +280,20 @@ public class TrigonometricFunction {
     }
 
     /**
-     * Calculates the inverse tangent (arctangent) of a value with the specified {@link AngleMode}.
+     * Calculates the inverse tangent (arctangent) of a value with the specified {@link AngleMode} as a formatted string.
      * @param value The value to calculate the arctangent of.
-     * @param mode The angle mode (DEGREES returns degrees, RADIANS returns radians).
+     * @param mode The angle mode.
      * @return The arctangent value as a string.
      */
     public static String handleAtan(String value, AngleMode mode) {
-        if (mode == AngleMode.RADIANS) {
-            if (value.equals("Infinity") || value.equals("∞")) {
-                return OutputFormatter.formatDouble(Math.PI / 2);
-            } else if (value.equals("-Infinity") || value.equals("-∞")) {
-                return OutputFormatter.formatDouble(-Math.PI / 2);
-            }
-            double val = Double.parseDouble(value);
-            if (val == 0) return "0";
-            return OutputFormatter.formatDouble(Math.atan(val));
-        }
-
+        double dVal;
         if (value.equals("Infinity") || value.equals("∞")) {
-            return "90"; // atan(∞) = 90 degrees
+            dVal = Double.POSITIVE_INFINITY;
         } else if (value.equals("-Infinity") || value.equals("-∞")) {
-            return "-90"; // atan(-∞) = -90 degrees
+            dVal = Double.NEGATIVE_INFINITY;
+        } else {
+            dVal = Double.parseDouble(value);
         }
-        double val = Double.parseDouble(value);
-        if (val == 0) return "0";
-        if (val == 1) return "45";
-        if (val == -1) return "-45";
-        
-        return OutputFormatter.formatDouble(Math.toDegrees(Math.atan(val)));
+        return OutputFormatter.formatDouble(atan(dVal, mode));
     }
 }

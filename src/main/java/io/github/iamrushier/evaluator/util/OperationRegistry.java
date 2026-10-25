@@ -17,21 +17,21 @@ public class OperationRegistry {
 
     static {
         registerFunction("sin", (arg, config) ->
-            new Operand(Double.parseDouble(TrigonometricFunction.handleSin(arg.getAsBigDecimal(), getMode(config)))));
+            new Operand(TrigonometricFunction.sin(arg.getAsBigDecimal(), getMode(config))));
         registerFunction("cos", (arg, config) ->
-            new Operand(Double.parseDouble(TrigonometricFunction.handleCos(arg.getAsBigDecimal(), getMode(config)))));
+            new Operand(TrigonometricFunction.cos(arg.getAsBigDecimal(), getMode(config))));
         registerFunction("tan", (arg, config) ->
-            new Operand(Double.parseDouble(TrigonometricFunction.handleTan(arg.getAsBigDecimal(), getMode(config)))));
+            new Operand(TrigonometricFunction.tan(arg.getAsBigDecimal(), getMode(config))));
         registerFunction("asin", (arg, config) ->
-            new Operand(Double.parseDouble(TrigonometricFunction.handleAsin(arg.getAsBigDecimal(), getMode(config)))));
+            new Operand(TrigonometricFunction.asin(arg.getAsBigDecimal(), getMode(config))));
         registerFunction("acos", (arg, config) ->
-            new Operand(Double.parseDouble(TrigonometricFunction.handleAcos(arg.getAsBigDecimal(), getMode(config)))));
+            new Operand(TrigonometricFunction.acos(arg.getAsBigDecimal(), getMode(config))));
         registerFunction("atan", (arg, config) ->
-            new Operand(Double.parseDouble(TrigonometricFunction.handleAtan(arg.toString(), getMode(config)))));
+            new Operand(TrigonometricFunction.atan(arg.getAsDouble(), getMode(config))));
         registerFunction("log", (arg, config) ->
-            new Operand(Double.parseDouble(LogarithmicFunction.handleLog(arg.getAsBigDecimal()))));
+            new Operand(LogarithmicFunction.log(arg.getAsBigDecimal())));
         registerFunction("ln", (arg, config) ->
-            new Operand(Double.parseDouble(LogarithmicFunction.handleLn(arg.getAsBigDecimal()))));
+            new Operand(LogarithmicFunction.ln(arg.getAsBigDecimal())));
     }
 
     private static AngleMode getMode(EvaluationConfig config) {
