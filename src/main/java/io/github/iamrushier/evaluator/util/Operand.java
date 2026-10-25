@@ -54,7 +54,6 @@ public class Operand {
             }
             return new Operand(new BigDecimal(value));
         } catch (NumberFormatException e) {
-            // Check for scientific notation or other double formats
             return new Operand(Double.parseDouble(value));
         }
     }
@@ -114,15 +113,17 @@ public class Operand {
             return "NaN";
         }
 
+        BigDecimal bd;
         if (bigDecimalValue != null) {
-            return OutputFormatter.formatResult(bigDecimalValue);
+            bd = bigDecimalValue;
+        } else {
+            String doubleStr = String.valueOf(doubleValue);
+            if (doubleStr.contains("E") || doubleStr.contains("e")) {
+                return OutputFormatter.consistentScientific(doubleStr);
+            }
+            bd = BigDecimal.valueOf(doubleValue);
         }
 
-        String doubleStr = String.valueOf(doubleValue);
-        if (doubleStr.contains("E") || doubleStr.contains("e")) {
-            return OutputFormatter.consistentScientific(doubleStr);
-        }
-
-        return OutputFormatter.formatDouble(doubleValue);
+        return OutputFormatter.formatResult(bd);
     }
 }

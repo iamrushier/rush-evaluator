@@ -16,12 +16,12 @@ Add RushEvaluator to your project using your preferred build tool:
 
 ### Gradle (Groovy DSL)
 ```groovy
-implementation 'io.github.iamrushier:rush-evaluator:2.1.0'
+implementation 'io.github.iamrushier:rush-evaluator:2.1.1'
 ```
 
 ### Gradle (Kotlin DSL)
 ```kotlin
-implementation("io.github.iamrushier:rush-evaluator:2.1.0")
+implementation("io.github.iamrushier:rush-evaluator:2.1.1")
 ```
 
 ### Apache Maven
@@ -29,7 +29,7 @@ implementation("io.github.iamrushier:rush-evaluator:2.1.0")
 <dependency>
     <groupId>io.github.iamrushier</groupId>
     <artifactId>rush-evaluator</artifactId>
-    <version>2.1.0</version>
+    <version>2.1.1</version>
 </dependency>
 ```
 

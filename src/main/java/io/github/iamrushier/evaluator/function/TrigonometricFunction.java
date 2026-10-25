@@ -33,6 +33,37 @@ public class TrigonometricFunction {
     }
 
     /**
+     * Checks if a radian angle corresponds to a standard special angle (multiples of π/6 or π/4).
+     */
+    private static Double checkRadianSpecialAngle(double rad, String func) {
+        double ratio = rad / Math.PI;
+
+        // Check multiples of pi/6 (0, 30, 60, 90, 120, 150, 180, 210, 240, 270, 300, 330, 360)
+        long r6 = Math.round(ratio * 6.0);
+        if (Math.abs(ratio * 6.0 - r6) < 1e-10) {
+            BigDecimal deg = BigDecimal.valueOf(r6 * 30.0);
+            switch (func) {
+                case "sin": return sin(deg, AngleMode.DEGREES);
+                case "cos": return cos(deg, AngleMode.DEGREES);
+                case "tan": return tan(deg, AngleMode.DEGREES);
+            }
+        }
+
+        // Check multiples of pi/4 (45, 135, 225, 315)
+        long r4 = Math.round(ratio * 4.0);
+        if (Math.abs(ratio * 4.0 - r4) < 1e-10) {
+            BigDecimal deg = BigDecimal.valueOf(r4 * 45.0);
+            switch (func) {
+                case "sin": return sin(deg, AngleMode.DEGREES);
+                case "cos": return cos(deg, AngleMode.DEGREES);
+                case "tan": return tan(deg, AngleMode.DEGREES);
+            }
+        }
+
+        return null;
+    }
+
+    /**
      * Calculates the sine of an angle as a {@code double}.
      *
      * @param angle The angle.
@@ -41,7 +72,14 @@ public class TrigonometricFunction {
      */
     public static double sin(BigDecimal angle, AngleMode mode) {
         if (mode == AngleMode.RADIANS) {
-            return Math.sin(angle.doubleValue());
+            double rad = angle.doubleValue();
+            Double special = checkRadianSpecialAngle(rad, "sin");
+            if (special != null) {
+                return special;
+            }
+            double s = Math.sin(rad);
+            if (Math.abs(s) < 1e-15) return 0.0;
+            return s;
         }
 
         BigDecimal normalizedAngle = normalizeAngle(angle);
@@ -64,7 +102,14 @@ public class TrigonometricFunction {
      */
     public static double cos(BigDecimal angle, AngleMode mode) {
         if (mode == AngleMode.RADIANS) {
-            return Math.cos(angle.doubleValue());
+            double rad = angle.doubleValue();
+            Double special = checkRadianSpecialAngle(rad, "cos");
+            if (special != null) {
+                return special;
+            }
+            double c = Math.cos(rad);
+            if (Math.abs(c) < 1e-15) return 0.0;
+            return c;
         }
 
         BigDecimal normalizedAngle = normalizeAngle(angle);
@@ -87,7 +132,14 @@ public class TrigonometricFunction {
      */
     public static double tan(BigDecimal angle, AngleMode mode) {
         if (mode == AngleMode.RADIANS) {
-            return Math.tan(angle.doubleValue());
+            double rad = angle.doubleValue();
+            Double special = checkRadianSpecialAngle(rad, "tan");
+            if (special != null) {
+                return special;
+            }
+            double t = Math.tan(rad);
+            if (Math.abs(t) < 1e-15) return 0.0;
+            return t;
         }
 
         BigDecimal normalizedAngle = normalizeAngle(angle);
@@ -114,6 +166,7 @@ public class TrigonometricFunction {
             throw new DomainException("Domain error");
         }
         if (mode == AngleMode.RADIANS) {
+            if (val == 0) return 0.0;
             return Math.asin(val);
         }
 
@@ -140,6 +193,7 @@ public class TrigonometricFunction {
             throw new DomainException("Domain error");
         }
         if (mode == AngleMode.RADIANS) {
+            if (val == 1) return 0.0;
             return Math.acos(val);
         }
 
