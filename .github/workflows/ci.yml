@@ -52,5 +52,12 @@ jobs:
             fi
           done
 
+      - name: Upload test failure reports
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: test-reports-${{ matrix.os }}-jdk${{ matrix.java }}
+          path: build/reports/tests/test/
+
       - name: Build and verify Javadoc
         run: ./gradlew build javadoc --no-daemon

@@ -197,15 +197,17 @@ public class AstParser {
             throw new SyntaxException("Expected '(' after function: " + functionName);
         }
 
-        List<ExpressionNode> args = new ArrayList<>();
-        if (!match(TokenType.PAREN_CLOSE)) {
-            do {
-                args.add(parseExpression());
-            } while (match(TokenType.COMMA));
+        if (match(TokenType.PAREN_CLOSE)) {
+            throw new SyntaxException("Empty argument list in function: " + functionName);
+        }
 
-            if (!match(TokenType.PAREN_CLOSE)) {
-                throw new SyntaxException("Missing closing parenthesis in function: " + functionName);
-            }
+        List<ExpressionNode> args = new ArrayList<>();
+        do {
+            args.add(parseExpression());
+        } while (match(TokenType.COMMA));
+
+        if (!match(TokenType.PAREN_CLOSE)) {
+            throw new SyntaxException("Missing closing parenthesis in function: " + functionName);
         }
 
         return new FunctionNode(functionName, args);
