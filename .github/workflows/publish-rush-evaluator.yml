@@ -12,7 +12,7 @@ jobs:
   publish-github-packages:
     name: Publish to GitHub Packages
     runs-on: ubuntu-latest
-    if: github.ref_type == 'branch' || github.event_name == 'workflow_dispatch'
+    if: github.ref_type == 'branch' || startsWith(github.ref, 'refs/tags/v') || github.event_name == 'workflow_dispatch'
     permissions:
       contents: read
       packages: write
@@ -43,11 +43,11 @@ jobs:
           ORG_GRADLE_PROJECT_signingInMemoryKeyPassword: ${{ secrets.GPG_PASSPHRASE }}
 
   publish-maven-central:
-    name: Publish to Maven Central
+    name: Publish to Maven Central and Create Release
     runs-on: ubuntu-latest
     if: startsWith(github.ref, 'refs/tags/v') || github.event_name == 'workflow_dispatch'
     permissions:
-      contents: read
+      contents: write
 
     steps:
       - name: Checkout repository
@@ -70,3 +70,11 @@ jobs:
           ORG_GRADLE_PROJECT_mavenCentralPassword: ${{ secrets.MAVEN_PASSWORD }}
           ORG_GRADLE_PROJECT_signingInMemoryKey: ${{ secrets.GPG_SIGNING_KEY }}
           ORG_GRADLE_PROJECT_signingInMemoryKeyPassword: ${{ secrets.GPG_PASSPHRASE }}
+
+      - name: Create GitHub Release
+        if: startsWith(github.ref, 'refs/tags/v')
+        uses: softprops/action-gh-release@v2
+        with:
+          name: Release ${{ github.ref_name }}
+          tag_name: ${{ github.ref_name }}
+          generate_release_notes: true
