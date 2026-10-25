@@ -18,24 +18,24 @@ public class OperationRegistry {
 
     static {
         // Trigonometric
-        registerFunction("sin", (arg, config) ->
-            new Operand(TrigonometricFunction.sin(arg.getAsBigDecimal(), getMode(config))));
-        registerFunction("cos", (arg, config) ->
-            new Operand(TrigonometricFunction.cos(arg.getAsBigDecimal(), getMode(config))));
-        registerFunction("tan", (arg, config) ->
-            new Operand(TrigonometricFunction.tan(arg.getAsBigDecimal(), getMode(config))));
-        registerFunction("asin", (arg, config) ->
-            new Operand(TrigonometricFunction.asin(arg.getAsBigDecimal(), getMode(config))));
-        registerFunction("acos", (arg, config) ->
-            new Operand(TrigonometricFunction.acos(arg.getAsBigDecimal(), getMode(config))));
-        registerFunction("atan", (arg, config) ->
-            new Operand(TrigonometricFunction.atan(arg.getAsDouble(), getMode(config))));
+        registerFunction("sin", (args, config) ->
+            new Operand(TrigonometricFunction.sin(args.get(0).getAsBigDecimal(), getMode(config))));
+        registerFunction("cos", (args, config) ->
+            new Operand(TrigonometricFunction.cos(args.get(0).getAsBigDecimal(), getMode(config))));
+        registerFunction("tan", (args, config) ->
+            new Operand(TrigonometricFunction.tan(args.get(0).getAsBigDecimal(), getMode(config))));
+        registerFunction("asin", (args, config) ->
+            new Operand(TrigonometricFunction.asin(args.get(0).getAsBigDecimal(), getMode(config))));
+        registerFunction("acos", (args, config) ->
+            new Operand(TrigonometricFunction.acos(args.get(0).getAsBigDecimal(), getMode(config))));
+        registerFunction("atan", (args, config) ->
+            new Operand(TrigonometricFunction.atan(args.get(0).getAsDouble(), getMode(config))));
 
         // Logarithmic
-        registerFunction("log", (arg, config) ->
-            new Operand(LogarithmicFunction.log(arg.getAsBigDecimal())));
-        registerFunction("ln", (arg, config) ->
-            new Operand(LogarithmicFunction.ln(arg.getAsBigDecimal())));
+        registerFunction("log", (args, config) ->
+            new Operand(LogarithmicFunction.log(args.get(0).getAsBigDecimal())));
+        registerFunction("ln", (args, config) ->
+            new Operand(LogarithmicFunction.ln(args.get(0).getAsBigDecimal())));
 
         // Utility & Multi-argument
         registerFunction("abs", UtilityFunction.ABS);

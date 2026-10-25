@@ -1,15 +1,25 @@
 package io.github.iamrushier.evaluator.function;
 
 import io.github.iamrushier.evaluator.config.EvaluationConfig;
-import io.github.iamrushier.evaluator.exception.SyntaxException;
 import io.github.iamrushier.evaluator.util.Operand;
 import java.util.Collections;
 import java.util.List;
 
 /**
- * Interface for mathematical functions supporting single or multiple arguments.
+ * Functional interface for mathematical functions supporting single or multiple arguments.
  */
+@FunctionalInterface
 public interface Function {
+
+    /**
+     * Applies the function to a list of arguments using the provided configuration.
+     * This is the single abstract method (SAM) of the interface.
+     *
+     * @param arguments the list of function arguments (cannot be null)
+     * @param config the evaluation configuration
+     * @return the result of the function evaluation
+     */
+    Operand apply(List<Operand> arguments, EvaluationConfig config);
 
     /**
      * Applies the function to a single argument using default settings.
@@ -30,19 +40,5 @@ public interface Function {
      */
     default Operand apply(Operand argument, EvaluationConfig config) {
         return apply(Collections.singletonList(argument), config);
-    }
-
-    /**
-     * Applies the function to a list of arguments using the provided configuration.
-     *
-     * @param arguments the list of function arguments (cannot be null)
-     * @param config the evaluation configuration
-     * @return the result of the function evaluation
-     */
-    default Operand apply(List<Operand> arguments, EvaluationConfig config) {
-        if (arguments == null || arguments.isEmpty()) {
-            throw new SyntaxException("Function requires at least one argument");
-        }
-        return apply(arguments.get(0), config);
     }
 }
