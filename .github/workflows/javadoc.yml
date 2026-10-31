@@ -38,16 +38,16 @@ jobs:
 
       - name: Setup Pages
         id: configure_pages
-        uses: actions/configure-pages@v5
+        uses: actions/configure-pages@v6
         continue-on-error: true
 
       - name: Upload Pages artifact
         if: steps.configure_pages.outcome == 'success'
-        uses: actions/upload-pages-artifact@v3
+        uses: actions/upload-pages-artifact@v5
         with:
           path: build/docs/javadoc
 
       - name: Deploy to GitHub Pages
         if: steps.configure_pages.outcome == 'success'
         id: deployment
-        uses: actions/deploy-pages@v4
+        uses: actions/deploy-pages@v5
