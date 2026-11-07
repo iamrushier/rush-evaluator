@@ -17,12 +17,12 @@ Add RushEvaluator to your project using your preferred build tool:
 
 ### Gradle (Groovy DSL)
 ```groovy
-implementation 'io.github.iamrushier:rush-evaluator:2.2.0'
+implementation 'io.github.iamrushier:rush-evaluator:2.3.0'
 ```
 
 ### Gradle (Kotlin DSL)
 ```kotlin
-implementation("io.github.iamrushier:rush-evaluator:2.2.0")
+implementation("io.github.iamrushier:rush-evaluator:2.3.0")
 ```
 
 ### Apache Maven
@@ -30,7 +30,7 @@ implementation("io.github.iamrushier:rush-evaluator:2.2.0")
 <dependency>
     <groupId>io.github.iamrushier</groupId>
     <artifactId>rush-evaluator</artifactId>
-    <version>2.2.0</version>
+    <version>2.3.0</version>
 </dependency>
 ```
 
@@ -51,6 +51,8 @@ implementation("io.github.iamrushier:rush-evaluator:2.2.0")
   - Trigonometric: `sin`, `cos`, `tan`, `asin`, `acos`, `atan` (configurable: Degrees or Radians)
   - Logarithmic: `log` (base 10) and `ln` (natural logarithm)
 - **🧩 Scope-Safe Custom Functions:** Register user-defined lambdas thread-safely on `EvaluationConfig`.
+- **📍 Character-Accurate Syntax Error Positions:** `SyntaxException` captures precise 0-indexed character offsets (`getPosition()`) for clear UI reporting and diagnostics.
+- **✅ Non-Throwing Validation:** Check expression syntax or full solvability with `RushEvaluator.isValid()` and `RushEvaluator.isSyntaxValid()`.
 - **🔢 Constants:** High-precision constants for `π` (Pi), `e` (Euler's number), and `∞` (Infinity).
 - **🤝 Smart Syntax & Preprocessing:**
   - **Implicit Multiplication:** Handles `2π`, `2(3+4)`, `(2)(3)`, `2x`, `x(y + 1)`
@@ -134,6 +136,33 @@ public class CustomFunctionExample {
 }
 ```
 
+### 4. Expression Validation & Pinpoint Error Positions
+```java
+import io.github.iamrushier.evaluator.RushEvaluator;
+import io.github.iamrushier.evaluator.exception.SyntaxException;
+import java.util.Collections;
+
+public class ValidationExample {
+    public static void main(String[] args) {
+        // Non-throwing syntax check
+        boolean isSyntaxOk = RushEvaluator.isSyntaxValid("2 * (3 + 4)"); // true
+        boolean isBadSyntax = RushEvaluator.isSyntaxValid("2 + * 3");     // false
+
+        // Non-throwing full validation (syntax + variables present)
+        boolean canEvaluate = RushEvaluator.isValid("2 * x + 1", Collections.singletonMap("x", 5)); // true
+        boolean missingVar = RushEvaluator.isValid("2 * x + 1"); // false (variable 'x' missing)
+
+        // Precise error positions for UI error reporting
+        try {
+            RushEvaluator.evaluate("2 + * 3");
+        } catch (SyntaxException e) {
+            System.out.println(e.getMessage());  // "Unexpected token '*' at position 4"
+            System.out.println(e.getPosition()); // 4
+        }
+    }
+}
+```
+
 ---
 
 ## ⚠️ Exception Handling
@@ -142,7 +171,7 @@ RushEvaluator provides explicit exceptions under the `io.github.iamrushier.evalu
 
 | Exception | Cause / Example |
 | :--- | :--- |
-| **`SyntaxException`** | Malformed expression syntax, mismatched parentheses (`(2+3`), or undefined variables. |
+| **`SyntaxException`** | Malformed expression syntax, mismatched parentheses (`(2+3`), or undefined variables. Exposes the exact 0-indexed character offset via `getPosition()`. |
 | **`DomainException`** | Mathematical domain errors such as division by zero (`1/0`), square root of negative numbers (`√-1`), or undefined forms (`0/0`, `0^0`). |
 | **`EvaluationException`** | Common unchecked base exception for all library-specific errors. |
 
@@ -173,7 +202,10 @@ cd rush-evaluator
 - [x] Compiled Expression AST engine with Constant Folding.
 - [x] Multi-argument functions (`min`, `max`, `round`) and standard utilities (`abs`, `floor`, `ceil`).
 - [x] Scope-safe custom user-defined functions via `EvaluationConfig`.
+- [x] Character-level syntax error position tracking in `SyntaxException`.
+- [x] Non-throwing validation APIs (`RushEvaluator.isValid` and `RushEvaluator.isSyntaxValid`).
 - [x] Automated Javadoc hosting on GitHub Pages.
+- [x] **v2.3.0 Stable Release** — Core features standardized and stabilized.
 
 ---
 

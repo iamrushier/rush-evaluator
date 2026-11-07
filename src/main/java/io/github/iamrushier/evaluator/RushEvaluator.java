@@ -98,6 +98,100 @@ public class RushEvaluator {
         CACHE.clear();
     }
 
+    // ==================== Validation Methods ====================
+
+    /**
+     * Checks if a mathematical expression string is valid and evaluable using default settings.
+     *
+     * @param expression The mathematical expression string to validate.
+     * @return {@code true} if the expression is syntactically valid and evaluable, {@code false} otherwise.
+     */
+    public static boolean isValid(String expression) {
+        return isValid(expression, null, EvaluationConfig.defaultConfig());
+    }
+
+    /**
+     * Checks if a mathematical expression string is valid and evaluable with the given variables.
+     *
+     * @param expression The mathematical expression string to validate.
+     * @param variables Map of variable names to their values.
+     * @return {@code true} if valid and evaluable with the provided variables, {@code false} otherwise.
+     */
+    public static boolean isValid(String expression, Map<String, ?> variables) {
+        return isValid(expression, variables, EvaluationConfig.defaultConfig());
+    }
+
+    /**
+     * Checks if a mathematical expression string is valid and evaluable with the given configuration.
+     *
+     * @param expression The mathematical expression string to validate.
+     * @param config The evaluation configuration.
+     * @return {@code true} if valid and evaluable, {@code false} otherwise.
+     */
+    public static boolean isValid(String expression, EvaluationConfig config) {
+        return isValid(expression, null, config);
+    }
+
+    /**
+     * Checks if a mathematical expression string is valid and evaluable with the given variables and configuration.
+     *
+     * @param expression The mathematical expression string to validate.
+     * @param variables Map of variable names to their values.
+     * @param config The evaluation configuration.
+     * @return {@code true} if valid and evaluable, {@code false} otherwise.
+     */
+    public static boolean isValid(String expression, Map<String, ?> variables, EvaluationConfig config) {
+        if (expression == null || expression.trim().isEmpty()) {
+            return false;
+        }
+        try {
+            if (config == null) {
+                config = EvaluationConfig.defaultConfig();
+            }
+            CompiledExpression compiled = compile(expression, config);
+            if (variables != null) {
+                compiled.validateVariables(variables);
+                compiled.evaluate(variables, config);
+            } else if (!compiled.isConstant()) {
+                return false;
+            } else {
+                compiled.evaluate(config);
+            }
+            return true;
+        } catch (Exception e) {
+            return false;
+        }
+    }
+
+    /**
+     * Checks if a mathematical expression string has valid syntax, regardless of whether variable values are bound.
+     *
+     * @param expression The mathematical expression string to check.
+     * @return {@code true} if the expression syntax is valid, {@code false} otherwise.
+     */
+    public static boolean isSyntaxValid(String expression) {
+        return isSyntaxValid(expression, EvaluationConfig.defaultConfig());
+    }
+
+    /**
+     * Checks if a mathematical expression string has valid syntax using the provided configuration.
+     *
+     * @param expression The mathematical expression string to check.
+     * @param config The evaluation configuration.
+     * @return {@code true} if the expression syntax is valid, {@code false} otherwise.
+     */
+    public static boolean isSyntaxValid(String expression, EvaluationConfig config) {
+        if (expression == null || expression.trim().isEmpty()) {
+            return false;
+        }
+        try {
+            compile(expression, config);
+            return true;
+        } catch (Exception e) {
+            return false;
+        }
+    }
+
     // ==================== evaluate (String output) ====================
 
     /**

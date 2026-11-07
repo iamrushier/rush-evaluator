@@ -15,7 +15,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * {@code AstParser} builds an abstract syntax tree (AST) of {@link ExpressionNode}s from a token stream.
+ * {@code AstParser} builds an abstract syntax tree (AST) of {@link ExpressionNode}s from a positional token stream.
  */
 public class AstParser {
 
@@ -43,13 +43,13 @@ public class AstParser {
      */
     public ExpressionNode parse() {
         if (tokens == null || tokens.isEmpty() || peek().getType() == TokenType.EOF) {
-            throw new SyntaxException("Empty expression");
+            throw new SyntaxException("Empty expression", 0);
         }
 
         ExpressionNode root = parseExpression();
 
         if (peek().getType() != TokenType.EOF) {
-            throw new SyntaxException("Unexpected token after expression: " + peek().getValue());
+            throw new SyntaxException("Unexpected token after expression: " + peek().getValue(), peek().getPosition());
         }
 
         // Perform constant folding optimization
@@ -87,7 +87,7 @@ public class AstParser {
             if (op.equals("+") || op.equals("-")) {
                 eat();
                 if (peek().getType() == TokenType.OPERATOR || peek().getType() == TokenType.EOF) {
-                    throw new SyntaxException("Invalid expression");
+                    throw new SyntaxException("Invalid expression", peek().getPosition());
                 }
                 ExpressionNode nextTerm = parseTerm();
                 result = new BinaryOpNode(op.charAt(0), result, nextTerm);
@@ -106,7 +106,7 @@ public class AstParser {
                 if (op.equals("*") || op.equals("/")) {
                     eat();
                     if (peek().getType() == TokenType.OPERATOR || peek().getType() == TokenType.EOF) {
-                        throw new SyntaxException("Invalid expression");
+                        throw new SyntaxException("Invalid expression", peek().getPosition());
                     }
                     ExpressionNode nextFactor = parsePower();
                     result = new BinaryOpNode(op.charAt(0), result, nextFactor);
@@ -132,7 +132,7 @@ public class AstParser {
         ExpressionNode result = parseFactor();
         while (matchOperator("^")) {
             if (peek().getType() == TokenType.OPERATOR || peek().getType() == TokenType.EOF) {
-                throw new SyntaxException("Invalid expression");
+                throw new SyntaxException("Invalid expression", peek().getPosition());
             }
             ExpressionNode exponent = parseFactor();
             result = new BinaryOpNode('^', result, exponent);
@@ -150,7 +150,7 @@ public class AstParser {
                 isNegative = op.equals("-");
                 eat();
                 if (peek().getType() == TokenType.OPERATOR) {
-                    throw new SyntaxException("Invalid expression");
+                    throw new SyntaxException("Invalid expression", peek().getPosition());
                 }
             }
         }
@@ -159,7 +159,7 @@ public class AstParser {
         if (match(TokenType.PAREN_OPEN)) {
             result = parseExpression();
             if (!match(TokenType.PAREN_CLOSE)) {
-                throw new SyntaxException("Missing closing parenthesis");
+                throw new SyntaxException("Missing closing parenthesis", peek().getPosition());
             }
         } else if (peek().getType() == TokenType.ROOT) {
             String rootType = eat().getValue();
@@ -171,7 +171,7 @@ public class AstParser {
                 case "\u03c0": case "PI": result = new NumberNode(new Operand(Constants.PI)); break;
                 case "e": result = new NumberNode(new Operand(Constants.EULER)); break;
                 case "\u221e": case "Infinity": result = new NumberNode(new Operand(Double.POSITIVE_INFINITY)); break;
-                default: throw new SyntaxException("Unknown constant: " + constant);
+                default: throw new SyntaxException("Unknown constant: " + constant, peek().getPosition());
             }
         } else if (peek().getType() == TokenType.FUNCTION) {
             result = parseFunction();
@@ -180,7 +180,7 @@ public class AstParser {
         } else if (peek().getType() == TokenType.VARIABLE) {
             result = new VariableNode(eat().getValue());
         } else {
-            throw new SyntaxException("Invalid expression");
+            throw new SyntaxException("Invalid expression", peek().getPosition());
         }
 
         while (matchOperator("^")) {
@@ -192,13 +192,14 @@ public class AstParser {
     }
 
     private ExpressionNode parseFunction() {
-        String functionName = eat().getValue();
+        Token funcToken = eat();
+        String functionName = funcToken.getValue();
         if (!match(TokenType.PAREN_OPEN)) {
-            throw new SyntaxException("Expected '(' after function: " + functionName);
+            throw new SyntaxException("Expected '(' after function: " + functionName, peek().getPosition());
         }
 
         if (match(TokenType.PAREN_CLOSE)) {
-            throw new SyntaxException("Empty argument list in function: " + functionName);
+            throw new SyntaxException("Empty argument list in function: " + functionName, peek().getPosition());
         }
 
         List<ExpressionNode> args = new ArrayList<>();
@@ -207,7 +208,7 @@ public class AstParser {
         } while (match(TokenType.COMMA));
 
         if (!match(TokenType.PAREN_CLOSE)) {
-            throw new SyntaxException("Missing closing parenthesis in function: " + functionName);
+            throw new SyntaxException("Missing closing parenthesis in function: " + functionName, peek().getPosition());
         }
 
         return new FunctionNode(functionName, args);

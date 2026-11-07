@@ -7,7 +7,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * {@code Lexer} converts a mathematical expression string into a list of tokens.
+ * {@code Lexer} converts a mathematical expression string into a list of positional tokens.
  */
 public class Lexer {
     private final String input;
@@ -35,7 +35,7 @@ public class Lexer {
     }
 
     /**
-     * Tokenizes the input string into a list of tokens.
+     * Tokenizes the input string into a list of tokens with position information.
      *
      * @return a list of {@link Token} objects
      * @throws SyntaxException if an invalid character is encountered
@@ -44,46 +44,46 @@ public class Lexer {
         List<Token> tokens = new ArrayList<>();
         while (index < input.length()) {
             char currentChar = input.charAt(index);
+            int startPos = index;
 
             if (Character.isDigit(currentChar) || currentChar == '.') {
-                tokens.add(new Token(TokenType.NUMBER, parseNumber()));
+                tokens.add(new Token(TokenType.NUMBER, parseNumber(), startPos));
             } else if (isOperator(currentChar)) {
-                tokens.add(new Token(TokenType.OPERATOR, String.valueOf(currentChar)));
+                tokens.add(new Token(TokenType.OPERATOR, String.valueOf(currentChar), startPos));
                 index++;
             } else if (currentChar == '(') {
-                tokens.add(new Token(TokenType.PAREN_OPEN, "("));
+                tokens.add(new Token(TokenType.PAREN_OPEN, "(", startPos));
                 index++;
             } else if (currentChar == ')') {
-                tokens.add(new Token(TokenType.PAREN_CLOSE, ")"));
+                tokens.add(new Token(TokenType.PAREN_CLOSE, ")", startPos));
                 index++;
             } else if (currentChar == ',') {
-                tokens.add(new Token(TokenType.COMMA, ","));
+                tokens.add(new Token(TokenType.COMMA, ",", startPos));
                 index++;
             } else if (currentChar == '\u221a' || currentChar == '\u221b') { // √ or ∛
-                tokens.add(new Token(TokenType.ROOT, String.valueOf(currentChar)));
+                tokens.add(new Token(TokenType.ROOT, String.valueOf(currentChar), startPos));
                 index++;
             } else if (currentChar == '\u03c0' || currentChar == '\u221e') { // π or ∞
-                tokens.add(new Token(TokenType.CONSTANT, String.valueOf(currentChar)));
+                tokens.add(new Token(TokenType.CONSTANT, String.valueOf(currentChar), startPos));
                 index++;
             } else if (Character.isLetter(currentChar) || currentChar == '_') {
                 String word = parseWord();
                 if (isConstant(word)) {
-                    tokens.add(new Token(TokenType.CONSTANT, word));
+                    tokens.add(new Token(TokenType.CONSTANT, word, startPos));
                 } else if (config.hasFunction(word) || OperationRegistry.isFunction(word)) {
-                    tokens.add(new Token(TokenType.FUNCTION, word));
+                    tokens.add(new Token(TokenType.FUNCTION, word, startPos));
                 } else {
-                    tokens.add(new Token(TokenType.VARIABLE, word));
+                    tokens.add(new Token(TokenType.VARIABLE, word, startPos));
                 }
             } else {
-                // Ignore whitespace if any remained, otherwise throw
                 if (Character.isWhitespace(currentChar)) {
                     index++;
                 } else {
-                    throw new SyntaxException("Invalid character: " + currentChar);
+                    throw new SyntaxException("Invalid character: " + currentChar, startPos);
                 }
             }
         }
-        tokens.add(new Token(TokenType.EOF, ""));
+        tokens.add(new Token(TokenType.EOF, "", index));
         return tokens;
     }
 

@@ -138,6 +138,20 @@ public final class CompiledExpression {
     }
 
     /**
+     * Evaluates this expression with variable bindings and the specified {@link EvaluationConfig}.
+     *
+     * @param variables map of variable names to values
+     * @param config the evaluation configuration
+     * @return the evaluated result formatted as a string
+     */
+    public String evaluate(Map<String, ?> variables, EvaluationConfig config) {
+        if (config == null) {
+            config = baseConfig;
+        }
+        return evaluate(config.withVariables(variables));
+    }
+
+    /**
      * Evaluates this expression using the provided {@link EvaluationConfig}.
      *
      * @param config the evaluation configuration
@@ -185,6 +199,20 @@ public final class CompiledExpression {
     }
 
     /**
+     * Evaluates this expression with variables using the provided {@link EvaluationConfig} to a {@link BigDecimal}.
+     *
+     * @param variables map of variable names to values
+     * @param config the evaluation configuration
+     * @return the evaluated result as a {@link BigDecimal}
+     */
+    public BigDecimal evaluateToBigDecimal(Map<String, ?> variables, EvaluationConfig config) {
+        if (config == null) {
+            config = baseConfig;
+        }
+        return evaluateToBigDecimal(config.withVariables(variables));
+    }
+
+    /**
      * Evaluates this expression using the provided {@link EvaluationConfig} to a {@link BigDecimal}.
      *
      * @param config the evaluation configuration
@@ -228,6 +256,20 @@ public final class CompiledExpression {
      */
     public double evaluateToDouble(Map<String, ?> variables, AngleMode angleMode) {
         return evaluateToDouble(baseConfig.withAngleMode(angleMode).withVariables(variables));
+    }
+
+    /**
+     * Evaluates this expression with variables using the provided {@link EvaluationConfig} to a primitive {@code double}.
+     *
+     * @param variables map of variable names to values
+     * @param config the evaluation configuration
+     * @return the evaluated result as a double
+     */
+    public double evaluateToDouble(Map<String, ?> variables, EvaluationConfig config) {
+        if (config == null) {
+            config = baseConfig;
+        }
+        return evaluateToDouble(config.withVariables(variables));
     }
 
     /**
