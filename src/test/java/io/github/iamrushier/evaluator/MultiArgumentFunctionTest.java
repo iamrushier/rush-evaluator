@@ -64,7 +64,7 @@ public class MultiArgumentFunctionTest {
 
         assertEquals("15", RushEvaluator.evaluate("min(x, y)", vars));
         assertEquals("25", RushEvaluator.evaluate("max(x, y)", vars));
-        assertEquals("0.6", RushEvaluator.evaluate("round(x / y, precision)", vars));
+        assertEquals("0.60", RushEvaluator.evaluate("round(x / y, precision)", vars));
     }
 
     @Test

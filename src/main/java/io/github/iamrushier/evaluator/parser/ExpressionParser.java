@@ -34,7 +34,7 @@ public class ExpressionParser {
      * @return The result of the parsed expression as an {@link Operand}.
      */
     public Operand parseToOperand(String expression) {
-        Lexer lexer = new Lexer(expression);
+        Lexer lexer = new Lexer(expression, config);
         AstParser parser = new AstParser(lexer.tokenize(), config);
         ExpressionNode root = parser.parse();
         return root.evaluate(config);

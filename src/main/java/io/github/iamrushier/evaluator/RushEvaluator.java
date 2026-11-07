@@ -79,7 +79,7 @@ public class RushEvaluator {
         }
 
         String validated = ExpressionValidator.validateExpression(expression);
-        Lexer lexer = new Lexer(validated);
+        Lexer lexer = new Lexer(validated, config);
         AstParser parser = new AstParser(lexer.tokenize(), config);
         ExpressionNode root = parser.parse();
         CompiledExpression compiled = new CompiledExpression(expression, root, config);

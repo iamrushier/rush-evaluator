@@ -1,5 +1,6 @@
 package io.github.iamrushier.evaluator.parser;
 
+import io.github.iamrushier.evaluator.config.EvaluationConfig;
 import io.github.iamrushier.evaluator.exception.SyntaxException;
 import io.github.iamrushier.evaluator.util.OperationRegistry;
 import java.util.ArrayList;
@@ -10,15 +11,27 @@ import java.util.List;
  */
 public class Lexer {
     private final String input;
+    private final EvaluationConfig config;
     private int index = 0;
 
     /**
-     * Constructs a {@code Lexer} for the given input expression.
+     * Constructs a {@code Lexer} for the given input expression using default configuration.
      *
      * @param input the mathematical expression to tokenize
      */
     public Lexer(String input) {
+        this(input, EvaluationConfig.defaultConfig());
+    }
+
+    /**
+     * Constructs a {@code Lexer} for the given input expression and configuration.
+     *
+     * @param input the mathematical expression to tokenize
+     * @param config the active evaluation configuration
+     */
+    public Lexer(String input, EvaluationConfig config) {
         this.input = input;
+        this.config = config != null ? config : EvaluationConfig.defaultConfig();
     }
 
     /**
@@ -56,7 +69,7 @@ public class Lexer {
                 String word = parseWord();
                 if (isConstant(word)) {
                     tokens.add(new Token(TokenType.CONSTANT, word));
-                } else if (OperationRegistry.isFunction(word)) {
+                } else if (config.hasFunction(word) || OperationRegistry.isFunction(word)) {
                     tokens.add(new Token(TokenType.FUNCTION, word));
                 } else {
                     tokens.add(new Token(TokenType.VARIABLE, word));
